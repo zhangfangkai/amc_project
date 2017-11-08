@@ -14,9 +14,9 @@ import json
 def index(req):
     return HttpResponse("Hello,world,this is pools index")
 def login(req):
-    return render_to_response('login.html', {}, RequestContext(req))
+    return render_to_response('signin.html', {}, RequestContext(req))
 def login2(req):
-    return render_to_response('login.html', {}, RequestContext(req))
+    return render_to_response('signin.html', {}, RequestContext(req))
 
 #----一般的request和response写法
 # def mainpage(req):
