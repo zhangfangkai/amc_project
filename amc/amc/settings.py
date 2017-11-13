@@ -113,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+LOGIN_URL = '/pools/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/

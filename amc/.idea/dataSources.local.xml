@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="dataSourceStorageLocal">
-    <data-source name="amc" uuid="918b5863-5c35-4836-b599-d99a12fc7c0e">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" />
-      <secret-storage>memory</secret-storage>
-      <first-sync>true</first-sync>
+    <data-source name="xiyin_amc2" uuid="2ed2a77b-5130-4d7c-ab29-9bf03a1770fa">
+      <database-info product="MySQL" version="5.7.15" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.40 ( Revision: 402933ef52cad9aa82624e80acbea46e3a701ce6 )">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
+      <secret-storage>master_key</secret-storage>
       <user-name>root</user-name>
+      <introspection-scope>amc2:</introspection-scope>
+      <resolve-scope>amc2:</resolve-scope>
     </data-source>
   </component>
 </project>
