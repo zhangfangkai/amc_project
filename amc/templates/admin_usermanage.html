@@ -1,0 +1,324 @@
+{% extends 'admin_base.html' %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+           管理员>用户管理
+            <span class="smart-widget-option">
+                <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm">添加用户</button>
+                <span class="refresh-icon-animated">
+                    <i class="fa fa-circle-o-notch fa-spin"></i>
+                </span>
+                <a href="#" class="widget-toggle-hidden-option">
+                    <i class="fa fa-cog"></i>
+                </a>
+                <a href="#" class="widget-collapse-option" data-toggle="collapse">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+            </span>
+        </div>
+        <!-- adduser-->
+		<div class="modal fade" id="formInModal" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">添加新用户</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="username">用户名</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="username" placeholder="请输入用户名">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="password">密码</label>
+                                 <div class="col-sm-8">
+                                     <input type="password" class="form-control" id="password" placeholder="请输入密码">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="realname">真实姓名</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="realname" placeholder="请输入真实姓名">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="userdepart">用户部门</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="userdepart" placeholder="请输入用户所在部门">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">用户角色</label>
+                                <input type="hidden"  name = "role" id="juese" value="1">
+                                <div class="col-sm-8">
+                                    <select id="sele" class="form-control">
+                                        <option value="1">管理员</option>
+                                        <option value="2">销售员</option>
+                                        <option value="3">仓储员</option>
+                                        <option value="4">财务员</option>
+                                        <option value="5">采购员</option>
+                                    </select>
+                                </div><!-- /.col -->
+                            </div><!-- /form-group -->
+		        		</form>
+                        <a id='adduser'class="btn btn-danger block m-top-md">添加</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- modifyuser-->
+		<div class="modal fade" id="modefyuser" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">修改用户信息</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
+                            <input id="modid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="username">用户名</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modname" placeholder="请输入用户名" value="">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="password">密码</label>
+                                 <div class="col-sm-8">
+                                     <input type="password" class="form-control" id="modpassword" placeholder="请输入密码">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="realname">真实姓名</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modrealname" placeholder="请输入真实姓名">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="userdepart">用户部门</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="moduserdepart" placeholder="请输入用户所在部门">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">用户角色</label>
+                                <input type="hidden"  name = "role" id="modjuese" value="1">
+                                <div class="col-sm-8">
+                                    <select id="sele2" style="background: #1dc499" class="form-control">
+                                        <option value="1">管理员</option>
+                                        <option value="2">销售员</option>
+                                        <option value="3">仓储员</option>
+                                        <option value="4">财务员</option>
+                                        <option value="5">采购员</option>
+                                    </select>
+                                </div><!-- /.col -->
+                            </div><!-- /form-group -->
+		        		</form>
+                        <a id='moduser'class="btn btn-danger block m-top-md">修改</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <div class="smart-widget-inner">
+            <div class="smart-widget-hidden-section">
+                <ul class="widget-color-list clearfix">
+                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
+                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
+					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
+					<li style="background-color:#2baab1;" data-color="widget-green"></li>
+					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
+					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
+					<li style="background-color:#e36159;" data-color="widget-red"></li>
+					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
+					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
+					<li style="background-color:#fff;" data-color="reset"></li>
+                </ul>
+            </div>
+            <div class="smart-widget-body">
+                <table class="table table-bordered" id="usertable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>姓名</th>
+                        <th>部门</th>
+                        <th>角色</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in userlist %}
+                        <tr id="{{ i.id }}">
+                            <td>{{ i.id }}</td>
+                            <td>{{ i.username }}</td>
+                            <td>{{ i.realname }}</td>
+                            <td>{{ i.depart }}</td>
+                            <td>{{ i.userrole }}</td>
+                            <td style="display:none;">{{ i.password }}</td>
+{#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
+                            <td>
+                                <button class="btn btn-info btn-xs del">删除</button>
+                                <button class="btn btn-info btn-xs modi">修改</button>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script src="/static/js/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#sele').change(function(){
+            var key = this.value;
+            $('#juese').val(key);
+        })
+        $('#sele2').change(function(){
+            var key = this.value;
+            $('#modjuese').val(key);
+        })
+        $('#adduser').on('click',function () {
+            var username = $('#username').val();
+            var password = $('#password').val();
+            var realname = $('#realname').val();
+            var userdepart = $('#userdepart').val();
+            var juese = $('#juese').val();
+            if(username==''){
+                $("#username").focus();
+            }else if(password==''){
+                $("#password").focus();
+            }else if(realname==''){
+                $("#realname").focus();
+            }else if(userdepart==''){
+                $("#userdepart").focus();
+            }else{
+                var data = {};
+                data['username']= username;
+                data['password']= password;
+                data['realname']=realname;
+                data['userdepart']=userdepart;
+                data['juese']=juese;
+                $.ajax({
+                    url: '/pools/admin_usermanage',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result.result == "post_success" ) {
+                            window.location.reload();
+{#                            alert("发起成功");#}
+{#                            var table = $("#usertable")#}
+{#                            var rows = table.rows.length#}
+{#                            var id = result.id#}
+{#                            var item = "<tr id="+id+"><td>"+id+"</td><td>"+username+"</td><td>"+realname+"</td><td>"#}
+{#                            +userdepart+"</td><td>"+juese+"</td><td><button type='button' class='btn btn-info btn-xs'>" +#}
+{#                                    "删除</button><button type='button' class='btn btn-info btn-xs'>修改</button></td></tr>"#}
+{#                            table.append(item)#}
+
+                        }else {
+                            alert('未成功');
+                        }
+                    }
+                });
+            }
+        })
+        $('.del').on('click',function () {
+            var r=confirm("警告：您确定要删除此问卷吗？（此操作不可恢复）");
+            if (r==true) {
+                var tr = $(this).parents("tr")
+                var id = tr.attr("id")
+                $.ajax({
+                    url: '/pools/admin_userdelete',
+                    type: 'POST',
+                    data: {userid: id},
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result.result == "post_success") {
+                            document.getElementById(result.id).remove();
+                        } else {
+                            alert('删除未成功');
+                        }
+                    }
+                });
+            }
+
+        })
+        $('.modi').on('click',function (){
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var username = tr.children("td").eq(1).text();
+            var realname = tr.children("td").eq(2).text();
+            var depart = tr.children("td").eq(3).text();
+            var password = tr.children("td").eq(5).text();
+
+            $('#modname').val(username);
+            $('#modrealname').val(realname);
+            $('#moduserdepart').val(depart);
+            $('#modpassword').val(password);
+            $("#modid").val(id)
+            $("#modefyuser").modal()
+        })
+        $('#moduser').on('click',function () {
+            var username = $('#modname').val();
+            var password = $('#modpassword').val();
+            var realname = $('#modrealname').val();
+            var userdepart = $('#moduserdepart').val();
+            var juese = $('#modjuese').val();
+            if(username==''){
+                $("#modname").focus();
+            }else if(password==''){
+                $("#modpassword").focus();
+            }else if(realname==''){
+                $("#modrealname").focus();
+            }else if(userdepart==''){
+                $("#moduserdepart").focus();
+            }else{
+                var data = {};
+                data['userid'] = $("#modid").val();
+                data['username']= username;
+                data['password']= password;
+                data['realname']=realname;
+                data['userdepart']=userdepart;
+                data['juese']=juese;
+                $.ajax({
+                    url: '/pools/admin_modify',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result.result == "post_success" ) {
+                            window.location.reload();
+{#                            alert("发起成功");#}
+{#                            var table = $("#usertable")#}
+{#                            var rows = table.rows.length#}
+{#                            var id = result.id#}
+{#                            var item = "<tr id="+id+"><td>"+id+"</td><td>"+username+"</td><td>"+realname+"</td><td>"#}
+{#                            +userdepart+"</td><td>"+juese+"</td><td><button type='button' class='btn btn-info btn-xs'>" +#}
+{#                                    "删除</button><button type='button' class='btn btn-info btn-xs'>修改</button></td></tr>"#}
+{#                            table.append(item)#}
+
+                        }else {
+                            alert('修改未成功');
+                        }
+                    }
+                });
+            }
+        })
+    })
+
+
+    </script>
+{% endblock %}

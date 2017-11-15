@@ -11,25 +11,6 @@ import json
 
 
 # Create your views here.
-def usermanage(req):
-    user_id = req.session['user_id']
-    username = req.session['realname']
-    data={}
-    user = User.objects.all()
-    userlist = []
-    for i in user:
-        userdetail={}
-        user_id = i.id
-        userdetail['id']= i.id
-        userdetail['username']= i.userName
-        userdetail['realname']= i.realName
-        userdetail['depart']=i.userDepart
-        userrole = Userrole.objects.get(id=i.userRole_id).roleName
-        userdetail['userrole']=userrole
-        userlist.append(userdetail)
-    data['userlist'] = userlist
-    data['realname'] = username
-    return render(req, 'usermanage.html', data)
 
 @csrf_exempt
 def login(req):
@@ -39,18 +20,101 @@ def login(req):
         username = req.POST.get('name')
         password = req.POST.get('password')
         if User.objects.filter(userName=username, userPassword=password).count() > 0:
-            user_id = User.objects.get(userName=username).id
-            realname = User.objects.get(id=user_id).realName
+            user = User.objects.get(userName=username)
+            user_id = user.id
+            userRoleid = user.userRole_id
             req.session['user_id'] = user_id
-            req.session['realname'] = realname
+            req.session['username'] = username
             data = {}
-            try:
-                data['realname'] = realname
-            except Exception, e:
-                print e
-            return render(req, 'index.html', data)
+            data['username'] = username
+            if userRoleid == 1:
+                return render(req, 'admin_base.html', data)
+            elif userRoleid ==2:
+                return render(req, 'xiaoshou_base.html', data)
+            elif userRoleid == 3:
+                return render(req, 'cangchu_base.html', data)
+            elif userRoleid == 4:
+                return render(req, 'caiwu_base.html', data)
+            elif userRoleid == 5:
+                return render(req, 'caigou_base.html', data)
+            else:
+                return render(req, 'signin.html', {})
         else:
             return render(req, 'signin.html', {} )
+
+@csrf_exempt
+def admin_usermanage(req):
+    if req.method == 'GET':
+        user_id = req.session['user_id']
+        username = req.session['username']
+        data={}
+        user = User.objects.all()
+        userlist = []
+        for i in user:
+            userdetail={}
+            user_id = i.id
+            userdetail['id']= i.id
+            userdetail['username']= i.userName
+            userdetail['realname']= i.realName
+            userdetail['depart']=i.userDepart
+            userdetail['password'] = i.userPassword
+            userrole = Userrole.objects.get(id=i.userRole_id).roleName
+            userdetail['userrole']=userrole
+            userlist.append(userdetail)
+        data['userlist'] = userlist
+        data['username'] = username
+        return render(req, 'admin_usermanage.html', data)
+    else:
+        print "keyile"
+        username = req.POST.get('username')
+        password = req.POST.get('password')
+        realname = req.POST.get('realname')
+        userdepart = req.POST.get('userdepart')
+        juese = req.POST.get('juese')
+        User.objects.create(userName=username,userPassword=password,realName=realname,userDepart=userdepart,userRole_id=juese)
+        print "keyile2"
+        data ={}
+        data['id'] = User.objects.get(userName = username).id
+        data['username'] = username;
+        data['realname'] = realname;
+        data['userdepart'] = userdepart;
+        data['juese'] = juese;
+        data['result'] = 'post_success';
+        # username = req.POST.get('')
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+@csrf_exempt
+def admin_userdelete(req):
+    if req.method == 'POST':
+        print "keyi shanchu"
+        user_id = req.POST.get('userid')
+        User.objects.filter(id=user_id).delete()
+        data = {}
+        data['result'] = 'post_success';
+        data['id'] = user_id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+@csrf_exempt
+def admin_modify(req):
+    if req.method == 'POST':
+        print "keyixiugai"
+        username = req.POST.get('username')
+        password = req.POST.get('password')
+        realname = req.POST.get('realname')
+        userdepart = req.POST.get('userdepart')
+        juese = req.POST.get('juese')
+        user_id = req.POST.get('userid')
+        User.objects.filter(id=user_id).update(userName=username,userPassword=password,realName=realname,userDepart=userdepart,userRole_id=juese)
+        data = {}
+        data['result'] = 'post_success';
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+def lockscreen(req):
+    data={}
+    username = req.session['username']
+    data['username']=username
+    return render(req, 'lockscreen.html', data)
+
 
 #----一般的request和response写法
 # def mainpage(req):
