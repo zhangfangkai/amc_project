@@ -5,9 +5,7 @@
            管理员>用户管理
             <span class="smart-widget-option">
                 <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm">添加用户</button>
-                <span class="refresh-icon-animated">
-                    <i class="fa fa-circle-o-notch fa-spin"></i>
-                </span>
+{#
                 <a href="#" class="widget-toggle-hidden-option">
                     <i class="fa fa-cog"></i>
                 </a>
@@ -161,8 +159,8 @@
                             <td style="display:none;">{{ i.password }}</td>
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
                             <td>
-                                <button class="btn btn-info btn-xs del">删除</button>
-                                <button class="btn btn-info btn-xs modi">修改</button>
+                                <button class="btn fa fa-trash  btn-info btn-sm del">删除</button>
+                                <button class="btn fa fa-pencil btn-info btn-sm modi">修改</button>
 
                             </td>
                         </tr>
@@ -234,7 +232,7 @@
             }
         })
         $('.del').on('click',function () {
-            var r=confirm("警告：您确定要删除此问卷吗？（此操作不可恢复）");
+            var r=confirm("警告：您确定要删除此用户吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr")
                 var id = tr.attr("id")

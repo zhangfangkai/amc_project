@@ -4,21 +4,14 @@
         <div class="smart-widget-header">
             销售员>订单管理
             <span class="smart-widget-option">
-                <span class="refresh-icon-animated">
-                    <i class="fa fa-circle-o-notch fa-spin"></i>
-                </span>
+                <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm">添加订单</button>
                 <a href="#" class="widget-toggle-hidden-option">
                     <i class="fa fa-cog"></i>
                 </a>
                 <a href="#" class="widget-collapse-option" data-toggle="collapse">
                     <i class="fa fa-chevron-up"></i>
                 </a>
-                <a href="#" class="widget-refresh-option">
-                    <i class="fa fa-refresh"></i>
-                </a>
-                <a href="#" class="widget-remove-option">
-                    <i class="fa fa-times"></i>
-                </a>
+
             </span>
         </div>
         <div class="smart-widget-inner">
@@ -58,8 +51,6 @@
                             <td>{{ i.receaddress }}</td>
                             <td>{{ i.ordertime|date:"Y-m-d H:i:s" }}</td>
                             <td>{{ i.status }}</td>
-{#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
-{#                            <td>发布/未发布</td>#}
                             <td><div ><a class="ccdd"> 修改 </a><a class='aabb' > 查看 </a><a class="del_wj"> 删除 </a><a class='bbbb'> 发布</a></div></td>
                         </tr>
                     {% endfor %}

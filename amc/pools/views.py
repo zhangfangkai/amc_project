@@ -57,8 +57,7 @@ def admin_usermanage(req):
             userdetail['realname']= i.realName
             userdetail['depart']=i.userDepart
             userdetail['password'] = i.userPassword
-            userrole = Userrole.objects.get(id=i.userRole_id).roleName
-            userdetail['userrole']=userrole
+            userdetail['userrole']=i.userRole.roleName
             userlist.append(userdetail)
         data['userlist'] = userlist
         data['username'] = username
@@ -116,12 +115,10 @@ def lockscreen(req):
 #wtq add-销售管理
 def sales_ordermanage(req):
     if req.method == 'GET':
-        print"aaaaaaaaaaaaaaaa"
         username = req.session['username']
         data={}
         sales = Order.objects.all()
         saleslist = []
-        print"bbbbbbbbbbbbbbb"
         for i in sales:
             salesdetail={}
             salesdetail['id']= i.id
@@ -132,10 +129,8 @@ def sales_ordermanage(req):
             salesdetail['status'] = i.status
             saleslist.append(salesdetail)
         data['saleslist'] = saleslist
-        data['realname'] = username
-        print"ccccccccccccc"
+        data['username'] = username
         return render(req, 'sales_ordermanage.html', data)
-        print"ddddddddddddd"
 
 #----一般的request和response写法
 # def mainpage(req):
