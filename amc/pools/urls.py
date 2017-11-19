@@ -5,4 +5,5 @@ urlpatterns = [
     url(r'^$',  login),
     url(r'^login', login),
     url(r'^usermanage', usermanage),
+    url(r'^salesmanage', salesmanage),
 ]

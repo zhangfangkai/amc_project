@@ -52,6 +52,33 @@ def login(req):
         else:
             return render(req, 'signin.html', {} )
 
+def salesmanage(req):
+    print"aaaaaaaaaaaaaaaa"
+    user_id = req.session['user_id']
+    username = req.session['realname']
+    data={}
+    sales = Order.objects.all()
+    saleslist = []
+    print"bbbbbbbbbbbbbbb"
+    for i in sales:
+        salesdetail={}
+        sales_id = i.id
+        salesdetail['id']= i.id#订单编号
+        salesdetail['user']= i.user#添加人员
+        salesdetail['customername'] = Customer.objects.get(id=i.Customer_id).customerName#顾客姓名
+        salesdetail['receaddress'] = i.receAddress  #收货地址
+        salesdetail['ordertime']= i.orderTime#下单时间
+        salesdetail['status'] = i.status  #订单状态
+        #userrole = Userrole.objects.get(id=i.userRole_id).roleName
+        #userdetail['userrole']=userrole
+        saleslist.append(salesdetail)
+    data['saleslist'] = saleslist
+    data['realname'] = username
+    print"ccccccccccccc"
+    return render(req, 'salesmanage.html', data)
+    print"ddddddddddddd"
+
+
 #----一般的request和response写法
 # def mainpage(req):
 #     data = {}
