@@ -1,8 +1,8 @@
-{% extends 'index.html' %}
+{% extends 'sales_base.html' %}
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            Bordered table
+            销售员>订单管理
             <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
@@ -56,7 +56,7 @@
                             <td>{{ i.user }}</td>
                             <td>{{ i.customername }}</td>
                             <td>{{ i.receaddress }}</td>
-                            <td>{{ i.ordertime }}</td>
+                            <td>{{ i.ordertime|date:"Y-m-d H:i:s" }}</td>
                             <td>{{ i.status }}</td>
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}

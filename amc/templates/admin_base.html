@@ -303,42 +303,5 @@
 		<script src="/static/js/simplify/simplify_dashboard.js"></script>
 
 
-		<script>
-			$(function()	{
-				$('.chart').easyPieChart({
-					easing: 'easeOutBounce',
-					size: '140',
-					lineWidth: '7',
-					barColor: '#7266ba',
-					onStep: function(from, to, percent) {
-						$(this.el).find('.percent').text(Math.round(percent));
-					}
-				});
-
-				$('.sortable-list').sortable();
-
-				$('.todo-checkbox').click(function()	{
-
-					var _activeCheckbox = $(this).find('input[type="checkbox"]');
-
-					if(_activeCheckbox.is(':checked'))	{
-						$(this).parent().addClass('selected');
-					}
-					else	{
-						$(this).parent().removeClass('selected');
-					}
-
-				});
-
-				//Delete Widget Confirmation
-				$('#deleteWidgetConfirm').popup({
-					vertical: 'top',
-					pagecontainer: '.container',
-					transition: 'all 0.3s'
-				});
-			});
-
-		</script>
-
   	</body>
 </html>

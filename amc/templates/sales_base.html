@@ -171,8 +171,8 @@
 									</span>
 								</a>
 								<ul class="submenu bg-palette4">
-									<li><a href="form_element.html"><span class="submenu-label">订单处理</span></a></li>
-									<li><a href="form_validation.html"><span class="submenu-label">顾客管理</span></a></li>
+									<li><a href="sales_ordermanage"><span class="submenu-label">订单处理</span></a></li>
+									<li><a href="#"><span class="submenu-label">顾客管理</span></a></li>
 								</ul>
 							</li>
 						</ul>
@@ -253,42 +253,6 @@
 		<script src="/static/js/simplify/simplify_dashboard.js"></script>
 
 
-		<script>
-			$(function()	{
-				$('.chart').easyPieChart({
-					easing: 'easeOutBounce',
-					size: '140',
-					lineWidth: '7',
-					barColor: '#7266ba',
-					onStep: function(from, to, percent) {
-						$(this.el).find('.percent').text(Math.round(percent));
-					}
-				});
-
-				$('.sortable-list').sortable();
-
-				$('.todo-checkbox').click(function()	{
-
-					var _activeCheckbox = $(this).find('input[type="checkbox"]');
-
-					if(_activeCheckbox.is(':checked'))	{
-						$(this).parent().addClass('selected');
-					}
-					else	{
-						$(this).parent().removeClass('selected');
-					}
-
-				});
-
-				//Delete Widget Confirmation
-				$('#deleteWidgetConfirm').popup({
-					vertical: 'top',
-					pagecontainer: '.container',
-					transition: 'all 0.3s'
-				});
-			});
-
-		</script>
 
   	</body>
 </html>

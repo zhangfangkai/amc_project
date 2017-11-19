@@ -30,7 +30,7 @@ def login(req):
             if userRoleid == 1:
                 return render(req, 'admin_base.html', data)
             elif userRoleid ==2:
-                return render(req, 'xiaoshou_base.html', data)
+                return render(req, 'sales_base.html', data)
             elif userRoleid == 3:
                 return render(req, 'cangchu_base.html', data)
             elif userRoleid == 4:
@@ -42,44 +42,16 @@ def login(req):
         else:
             return render(req, 'signin.html', {} )
 
-<<<<<<< HEAD
-def salesmanage(req):
-    print"aaaaaaaaaaaaaaaa"
-    user_id = req.session['user_id']
-    username = req.session['realname']
-    data={}
-    sales = Order.objects.all()
-    saleslist = []
-    print"bbbbbbbbbbbbbbb"
-    for i in sales:
-        salesdetail={}
-        sales_id = i.id
-        salesdetail['id']= i.id#订单编号
-        salesdetail['user']= i.user#添加人员
-        salesdetail['customername'] = Customer.objects.get(id=i.Customer_id).customerName#顾客姓名
-        salesdetail['receaddress'] = i.receAddress  #收货地址
-        salesdetail['ordertime']= i.orderTime#下单时间
-        salesdetail['status'] = i.status  #订单状态
-        #userrole = Userrole.objects.get(id=i.userRole_id).roleName
-        #userdetail['userrole']=userrole
-        saleslist.append(salesdetail)
-    data['saleslist'] = saleslist
-    data['realname'] = username
-    print"ccccccccccccc"
-    return render(req, 'salesmanage.html', data)
-    print"ddddddddddddd"
-=======
+
 @csrf_exempt
 def admin_usermanage(req):
     if req.method == 'GET':
-        user_id = req.session['user_id']
         username = req.session['username']
         data={}
         user = User.objects.all()
         userlist = []
         for i in user:
             userdetail={}
-            user_id = i.id
             userdetail['id']= i.id
             userdetail['username']= i.userName
             userdetail['realname']= i.realName
@@ -107,7 +79,6 @@ def admin_usermanage(req):
         data['userdepart'] = userdepart;
         data['juese'] = juese;
         data['result'] = 'post_success';
-        # username = req.POST.get('')
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 @csrf_exempt
@@ -141,8 +112,30 @@ def lockscreen(req):
     username = req.session['username']
     data['username']=username
     return render(req, 'lockscreen.html', data)
->>>>>>> e1dda9a1e066c13d3b0a98492db9533f35421f70
 
+#wtq add-销售管理
+def sales_ordermanage(req):
+    if req.method == 'GET':
+        print"aaaaaaaaaaaaaaaa"
+        username = req.session['username']
+        data={}
+        sales = Order.objects.all()
+        saleslist = []
+        print"bbbbbbbbbbbbbbb"
+        for i in sales:
+            salesdetail={}
+            salesdetail['id']= i.id
+            salesdetail['user']= i.user.realName
+            salesdetail['customername'] = i.customer.customerName
+            salesdetail['receaddress'] = i.receAddress
+            salesdetail['ordertime']= i.orderTime
+            salesdetail['status'] = i.status
+            saleslist.append(salesdetail)
+        data['saleslist'] = saleslist
+        data['realname'] = username
+        print"ccccccccccccc"
+        return render(req, 'sales_ordermanage.html', data)
+        print"ddddddddddddd"
 
 #----一般的request和response写法
 # def mainpage(req):

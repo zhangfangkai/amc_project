@@ -9,9 +9,7 @@
       <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
       <secret-storage>master_key</secret-storage>
       <user-name>root</user-name>
-      <introspection-schemas>*:amc2|amc2:</introspection-schemas>
       <resolve-scope>amc2:</resolve-scope>
-      <unqualified-resolve-schemas>amc2:</unqualified-resolve-schemas>
     </data-source>
   </component>
 </project>
