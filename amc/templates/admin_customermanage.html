@@ -1,9 +1,9 @@
-{% extends 'sales_base.html' %}
+{% extends 'admin_base.html' %}
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            销售员>订单管理
-            <span class="smart-widget-option">
+            管理员>客户管理
+             <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
@@ -40,30 +40,30 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>订单编号</th>
-                        <th>添加人员</th>
+                        <th>顾客编号</th>
                         <th>顾客姓名</th>
-                        <th>收货地址</th>
-                        <th>下单时间</th>
-                        <th>订单状态</th>
+                        <th>顾客地址</th>
+                        <th>联系电话</th>
+                        <th>邮箱</th>
+                        <th>顾客信用水平</th>
                         <th>操作</th>
+
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in saleslist %}
+                    {% for i in customerlist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.user }}</td>
                             <td>{{ i.customername }}</td>
-                            <td>{{ i.receaddress }}</td>
-                            <td>{{ i.ordertime|date:"Y-m-d H:i:s" }}</td>
-                            <td>{{ i.status }}</td>
+                            <td>{{ i.customeraddress }}</td>
+                            <td>{{ i.phone }}</td>
+                            <td>{{ i.email }}</td>
+                            <td>{{ i.credit }}</td>
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">已支付</button>
-                                <button class="btn btn-info btn-xs chuli">已处理</button>
-                                 <button class="btn btn-info btn-xs wancheng">已完成</button>
+                            <button class="btn btn-info btn-xs zhifu">修改信用水平</button>
+
                             </td>
                         </tr>
                     {% endfor %}
@@ -109,4 +109,4 @@
 
         })
 
-{% endblock %}
+{% endblock %}block %}

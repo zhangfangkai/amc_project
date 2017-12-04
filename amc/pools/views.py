@@ -57,7 +57,8 @@ def admin_usermanage(req):
             userdetail['realname']= i.realName
             userdetail['depart']=i.userDepart
             userdetail['password'] = i.userPassword
-            userdetail['userrole']=i.userRole.roleName
+            userrole = Userrole.objects.get(id=i.userRole_id).roleName
+            userdetail['userrole']=userrole
             userlist.append(userdetail)
         data['userlist'] = userlist
         data['username'] = username
@@ -79,6 +80,45 @@ def admin_usermanage(req):
         data['juese'] = juese;
         data['result'] = 'post_success';
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+def admin_salesmanage(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        sales = Order.objects.all()
+        saleslist = []
+        for i in sales:
+            salesdetail={}
+            salesdetail['id']= i.id
+            salesdetail['user']= i.user.realName
+            salesdetail['customername'] = i.customer.customerName
+            salesdetail['receaddress'] = i.receAddress
+            salesdetail['ordertime']= i.orderTime
+            salesdetail['status'] = i.status
+            saleslist.append(salesdetail)
+        data['saleslist'] = saleslist
+        data['realname'] = username
+        return render(req, 'admin_salesmanage.html', data)
+
+def admin_customermanage(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        clist = Customer.objects.all()
+        customerlist = []
+        for i in clist:
+            customerdetail={}
+            customerdetail['id']= i.id
+            customerdetail['customername'] = i.customerName
+            customerdetail['customeraddress'] = i.address
+            customerdetail['phone']= i.phone
+            customerdetail['email'] = i.email
+            customerdetail['credit'] = i.credit
+            customerlist.append(customerdetail)
+        data['customerlist'] = customerlist
+        #data['realname'] = username
+        return render(req, 'admin_customermanage.html', data)
+
 
 @csrf_exempt
 def admin_userdelete(req):
@@ -129,8 +169,18 @@ def sales_ordermanage(req):
             salesdetail['status'] = i.status
             saleslist.append(salesdetail)
         data['saleslist'] = saleslist
-        data['username'] = username
+        data['realname'] = username
         return render(req, 'sales_ordermanage.html', data)
+
+@csrf_exempt
+def sales_orderzhifu(req):
+    if req.method == 'POST':
+        print "keyi shanchu"
+        order_id = req.POST.get('orderid')
+        Order.objects.filter(id=order_id).update(status='已支付')
+        data = {}
+        data['result'] = 'post_success';
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 #----一般的request和response写法
 # def mainpage(req):

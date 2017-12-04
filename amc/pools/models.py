@@ -29,6 +29,7 @@ class Customer(models.Model):
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
     email = models.CharField(max_length=30)
+    credit= models.CharField(max_length=20)
 #订单表
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
