@@ -48,6 +48,7 @@ class Product(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     purchasePrice = models.FloatField()
     saleprice = models.FloatField()
+    status=models.IntegerField()
 #订单明细表
 class Order_detail(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -135,6 +136,17 @@ class SaleAccount(models.Model):
     receivable = models.ForeignKey(Receivable, on_delete=models.CASCADE)
     addTime = models.DateTimeField(auto_now=True)
     totalAccount = models.FloatField()
+# 发货单
+class Deliver(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE) #发货订单编号
+    addTime=addTime = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20)
+# 发货单明细
+class DeliverDatail(models.Model):
+    deliver = models.ForeignKey(Deliver, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    deliverNum = models.IntegerField()
+
 
 
 

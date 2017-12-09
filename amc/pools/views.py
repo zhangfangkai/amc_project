@@ -119,6 +119,145 @@ def admin_customermanage(req):
         #data['realname'] = username
         return render(req, 'admin_customermanage.html', data)
 
+def admin_chanpinguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        product = Product.objects.all()
+        productlist = []
+        for i in product:
+            productdetail={}
+            productdetail['id']= i.id
+            productdetail['productname']= i.productName
+            productdetail['productsize'] = i.productSize
+            productdetail['stock'] = i.stock
+            productdetail['safestock']= i.safastock
+            productdetail['purchaseprice'] = i.purchasePrice
+            productdetail['salesprice'] = i.saleprice
+            productdetail['supplierid'] = i.supplier
+
+            productlist.append(productdetail)
+        data['productlist'] = productlist
+        data['realname'] = username
+        return render(req, 'admin_chanpinguanli.html', data)
+
+
+def admin_beihuodanmanage(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        beihuodan = StocknoticeDetail.objects.all()
+        beihuodanlist = []
+
+        for i in beihuodan:
+            beihuodandetail={}
+            beihuodandetail['id']= i.id
+            beihuodandetail['pid']= Product.objects.get(id=i.product_id).id
+            beihuodandetail['productname'] = Product.objects.get(id=i.product_id).productName
+            beihuodandetail['number'] = i.stocknoticeNum
+            beihuodandetail['oid']= Stocknotice.objects.get(id=i.stocknotice_id).id
+            beihuodandetail['time'] = Stocknotice.objects.get(id=i.stocknotice_id).addTime
+            beihuodandetail['state'] = Stocknotice.objects.get(id=i.stocknotice_id).status
+            beihuodanlist.append(beihuodandetail)
+        data['beihuodanlist'] = beihuodanlist
+        data['realname'] = username
+        return render(req, 'admin_beihuodanmanage.html', data)
+
+
+def admin_jinhuodanguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        jinhuodan = PurchaseDatail.objects.all()
+        jinhuodanlist = []
+
+        for i in jinhuodan:
+            jinhuodandetail={}
+            jinhuodandetail['id']= i.id
+            jinhuodandetail['pid']= Product.objects.get(id=i.product_id).id
+            jinhuodandetail['productname'] = Product.objects.get(id=i.product_id).productName
+            jinhuodandetail['number'] = i.purchaseNum
+            jinhuodandetail['time'] = Purchase.objects.get(id=i.purchase_id).addTime
+            jinhuodandetail['state'] = Purchase.objects.get(id=i.purchase_id).status
+            jinhuodanlist.append(jinhuodandetail)
+        data['jinhuodanlist'] = jinhuodanlist
+        data['realname'] = username
+        return render(req, 'admin_jinhuodanguanli.html', data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######################################################
+def admin_fahuodanguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        fahuodan = DeliverDatail.objects.all()
+        fahuodanlist = []
+
+        for i in fahuodan:
+            fahuodandetail={}
+            fahuodandetail['id']= i.id
+
+            fahuodandetail['oid'] = Order.objects.get(id=i.deliver_id).id
+            fahuodandetail['pid']= Product.objects.get(id=i.product_id).id
+            fahuodandetail['productname'] = Product.objects.get(id=i.product_id).productName
+            fahuodandetail['number'] = i.deliverNum
+            fahuodandetail['time'] = Deliver.objects.get(id=i.deliver_id).addTime
+            fahuodandetail['state'] = Deliver.objects.get(id=i.deliver_id).status
+            fahuodanlist.append(fahuodandetail)
+        data['fahuodanlist'] = fahuodanlist
+        data['realname'] = username
+        return render(req, 'admin_fahuodanguanli.html', data)
+
+def admin_gongyingshangguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        supplier = Supplier.objects.all()
+        supplierlist = []
+        for i in supplier:
+            supplierdetail={}
+            supplierdetail['id']= i.id
+            supplierdetail['suppliercompany']= i.supplierName
+            supplierdetail['linkman'] = i.linkMan
+            supplierdetail['address'] = i.address
+            supplierdetail['phone']= i.phone
+            supplierdetail['email'] = i.email
+            supplierlist.append(supplierdetail)
+        data['supplierlist'] = supplierlist
+        data['realname'] = username
+        return render(req, 'admin_gongyingshangguanli.html', data)
+
+def admin_yingfuzhangfuanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        yingfuzhang = Payable.objects.all()
+        yingfuzhanglist = []
+
+        for i in yingfuzhang:
+            yingfuzhangdetail={}
+            yingfuzhangdetail['id']= i.id
+            yingfuzhangdetail['cgid'] = Purchase.objects.get(id=i.purchase_id).id
+            yingfuzhangdetail['time'] = i.addTime
+            yingfuzhangdetail['paystatus']= i.status
+            yingfuzhangdetail['invoicestatus'] = i.invoiceStatus
+            yingfuzhangdetail['total'] = i.totalAccount
+            yingfuzhanglist.append(yingfuzhangdetail)
+        data['yingfuzhanglist'] = yingfuzhanglist
+        data['realname'] = username
+        return render(req, 'admin_yingfuzhangfuanli.html', data)
+
 
 @csrf_exempt
 def admin_userdelete(req):

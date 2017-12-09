@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            管理员>备货单管理
+            管理员>进货单管理
              <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
@@ -40,32 +40,30 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>备货单编号</th>
+                        <th>进货单通知单编号</th>
                         <th>产品编号</th>
                         <th>产品名称</th>
-                        <th>备货数量</th>
-                        <th>销售订单编号</th>
+                        <th>进货数量</th>
                         <th>添加时间</th>
-                        <th>备货单状态</th>
+                        <th>进货单通知单状态</th>
                         <th>操作</th>
 
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in beihuodanlist %}
+                    {% for i in jinhuodanlist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
                             <td>{{ i.pid }}</td>
                             <td>{{ i.productname }}</td>
                             <td>{{ i.number }}</td>
-                            <td>{{ i.oid }}</td>
                             <td>{{ i.time }}</td>
                             <td>{{ i.state }}</td>
 
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">修改库存数量</button>
+                            <button class="btn btn-info btn-xs zhifu">修改通知单状态</button>
 
                             </td>
                         </tr>
