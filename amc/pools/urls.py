@@ -13,6 +13,8 @@ urlpatterns = [
     url(r'^admin_gongyingshangguanli', admin_gongyingshangguanli),
     url(r'^admin_beihuodanmanage', admin_beihuodanmanage),
     url(r'^admin_jinhuodanguanli', admin_jinhuodanguanli),
+    url(r'^admin_fahuodanguanli', admin_fahuodanguanli),
+    url(r'^admin_quehuodanguanli', admin_quehuodanguanli),
     url(r'^admin_userdelete', admin_userdelete),
     url(r'^admin_modify', admin_modify),
     url(r'^admin_yingfuzhangfuanli', admin_yingfuzhangfuanli),

@@ -185,18 +185,6 @@ def admin_jinhuodanguanli(req):
         return render(req, 'admin_jinhuodanguanli.html', data)
 
 
-
-
-
-
-
-
-
-
-
-
-
-#######################################################
 def admin_fahuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -207,7 +195,6 @@ def admin_fahuodanguanli(req):
         for i in fahuodan:
             fahuodandetail={}
             fahuodandetail['id']= i.id
-
             fahuodandetail['oid'] = Order.objects.get(id=i.deliver_id).id
             fahuodandetail['pid']= Product.objects.get(id=i.product_id).id
             fahuodandetail['productname'] = Product.objects.get(id=i.product_id).productName
@@ -218,6 +205,29 @@ def admin_fahuodanguanli(req):
         data['fahuodanlist'] = fahuodanlist
         data['realname'] = username
         return render(req, 'admin_fahuodanguanli.html', data)
+
+
+def admin_quehuodanguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        quehuodan = OutdemandDetail.objects.all()
+        quehuodanlist = []
+
+        for i in quehuodan:
+            quehuodandetail={}
+            quehuodandetail['id']= i.id
+            quehuodandetail['pid']= Product.objects.get(id=i.product_id).id
+            quehuodandetail['pname'] = Product.objects.get(id=i.product_id).productName
+            quehuodandetail['qnum'] = i.outNum
+            quehuodandetail['oid'] = OutDemand.objects.get(id=i.outDemand_id).order_id
+            quehuodandetail['time'] = OutDemand.objects.get(id=i.outDemand_id).addTime
+            quehuodandetail['user'] = OutDemand.objects.get(id=i.outDemand_id).user
+            quehuodandetail['state'] = OutDemand.objects.get(id=i.outDemand_id).status
+            quehuodanlist.append(quehuodandetail)
+        data['quehuodanlist'] = quehuodanlist
+        data['realname'] = username
+        return render(req, 'admin_quehuodanguanli.html', data)
 
 def admin_gongyingshangguanli(req):
     if req.method == 'GET':

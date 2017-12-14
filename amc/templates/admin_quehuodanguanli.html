@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            管理员>发货单管理
+            管理员>采购管理>缺货单管理
              <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
@@ -40,31 +40,33 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>发货单编号</th>
-                        <th>发货订单编号</th>
-                        <th>发货产品编号</th>
-                        <th>发货产品名称</th>
-                        <th>发货数量</th>
-                        <th>发货时间</th>
+                        <th>缺货单编号</th>
+                        <th>订单编号</th>
+                        <th>添加时间</th>
+                        <th>缺货产品名称</th>
+                        <th>缺货数量</th>
+                        <th>缺货单状态</th>
+                        <th>添加用户</th>
                         <th>操作</th>
 
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in fahuodanlist %}
+                    {% for i in quehuodanlist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
                             <td>{{ i.oid }}</td>
-                            <td>{{ i.pid }}</td>
-                            <td>{{ i.productname }}</td>
-                            <td>{{ i.number }}</td>
                             <td>{{ i.time }}</td>
-
+                            <td>{{ i.pname }}</td>
+                            <td>{{ i.qnum }}</td>
+                            <td>{{ i.status }}</td>
+                            <td>{{ i.user }}</td>
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">修改通知单状态</button>
-
+                            <button class="btn btn-info btn-xs zhifu">修改</button>
+                            <button class="btn btn-info btn-xs zhifu">查看</button>
+                            <button class="btn btn-info btn-xs zhifu">删除</button>
                             </td>
                         </tr>
                     {% endfor %}
