@@ -116,8 +116,26 @@ def admin_customermanage(req):
             customerdetail['credit'] = i.credit
             customerlist.append(customerdetail)
         data['customerlist'] = customerlist
-        #data['realname'] = username
+        data['realname'] = username
         return render(req, 'admin_customermanage.html', data)
+    else:
+        print "keyile"
+        customername = req.POST.get('customername')
+        customeraddress = req.POST.get('customeraddress')
+        phone = req.POST.get('phone')
+        email = req.POST.get('email')
+        credit = req.POST.get('credit')
+        Customer.objects.create(customerName=customername,address=customeraddress,phone=phone,email=email,credit=credit)
+        print "keyile2"
+        data ={}
+        data['id'] = Customer.objects.get(customerName = customername).id
+        data['customerName'] = customername;
+        data['address'] = customeraddress;
+        data['phone'] = phone;
+        data['email'] = email;
+        data['credit'] = credit;
+        data['result'] = 'post_success';
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 def admin_chanpinguanli(req):
     if req.method == 'GET':
@@ -206,7 +224,7 @@ def admin_fahuodanguanli(req):
         data['realname'] = username
         return render(req, 'admin_fahuodanguanli.html', data)
 
-
+#mkx-缺货单
 def admin_quehuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -228,6 +246,52 @@ def admin_quehuodanguanli(req):
         data['quehuodanlist'] = quehuodanlist
         data['realname'] = username
         return render(req, 'admin_quehuodanguanli.html', data)
+
+#mkx-再订货单
+def admin_zaidinghuodanguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        zaidinghuodan = AgainpurchaseDetail.objects.all()
+        zaidinghuodanlist = []
+
+        for i in zaidinghuodan:
+            zaidinghuodandetail={}
+            zaidinghuodandetail['id']= i.id
+            zaidinghuodandetail['pid']= Product.objects.get(id=i.product_id).id
+            zaidinghuodandetail['pname'] = Product.objects.get(id=i.product_id).productName
+            zaidinghuodandetail['pnum'] = i.purchaseNum
+            zaidinghuodandetail['apid'] = i.againpurchase_id #通知单编号
+            zaidinghuodandetail['time'] = Againpurchase.objects.get(id=i.againpurchase_id).addTime
+            zaidinghuodandetail['user'] = Againpurchase.objects.get(id=i.againpurchase_id).user
+            zaidinghuodandetail['state'] = Againpurchase.objects.get(id=i.againpurchase_id).status
+            zaidinghuodanlist.append(zaidinghuodandetail)
+        data['zaidinghuodanlist'] = zaidinghuodanlist
+        data['realname'] = username
+        return render(req, 'admin_zaidinghuodanguanli.html', data)
+
+#mkx-采购订单
+#def admin_caigoudingdanguanli(req):
+#    if req.method == 'GET':
+#        username = req.session['username']
+#        data={}
+#        caigoudingdan = AgainpurchaseDetail.objects.all()
+#        caigoudingdanlist = []
+
+#       for i in caigoudingdan:
+#            caigoudingdandetail={}
+#            caigoudingdandetail['id']= i.id
+#            caigoudingdandetail['pid']= Product.objects.get(id=i.product_id).id
+#            caigoudingdandetail['pname'] = Product.objects.get(id=i.product_id).productName
+#            caigoudingdandetail['pnum'] = i.purchaseNum
+#            caigoudingdandetail['apid'] = i.againpurchase_id #通知单编号
+#            caigoudingdandetail['time'] = Againpurchase.objects.get(id=i.againpurchase_id).addTime
+#            caigoudingdandetail['user'] = Againpurchase.objects.get(id=i.againpurchase_id).user
+#            caigoudingdandetail['state'] = Againpurchase.objects.get(id=i.againpurchase_id).status
+#            caigoudingdanlist.append(caigoudingdandetail)
+#        data['caigoudingdanlist'] = caigoudingdanlist
+#        data['realname'] = username
+#        return render(req, 'admin_caigoudingdanguanli.html', data)
 
 def admin_gongyingshangguanli(req):
     if req.method == 'GET':
@@ -268,6 +332,63 @@ def admin_yingfuzhangfuanli(req):
         data['realname'] = username
         return render(req, 'admin_yingfuzhangfuanli.html', data)
 
+#mkx-应收帐
+def admin_yingshouzhangguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        yingshouzhang = Receivable.objects.all()
+        yingshouzhanglist = []
+
+        for i in yingshouzhang:
+            yingshouzhangdetail={}
+            yingshouzhangdetail['id']= i.id
+            yingshouzhangdetail['bhid'] = Stocknotice.objects.get(id=i.stocknotice_id).id
+            yingshouzhangdetail['time'] = i.addTime
+            yingshouzhangdetail['status'] = i.status
+            yingshouzhangdetail['total'] = i.totalAccount
+            yingshouzhanglist.append(yingshouzhangdetail)
+        data['yingshouzhanglist'] = yingshouzhanglist
+        data['realname'] = username
+        return render(req, 'admin_yingshouzhangguanli.html', data)
+
+#mkx-销售帐
+def admin_xiaoshouzhangguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        xiaoshouzhang = SaleAccount.objects.all()
+        xiaoshouzhanglist = []
+
+        for i in xiaoshouzhang:
+            xiaoshouzhangdetail={}
+            xiaoshouzhangdetail['id']= i.id
+            xiaoshouzhangdetail['rcid'] = Receivable.objects.get(id=i.receivable_id).id
+            xiaoshouzhangdetail['time'] = i.addTime
+            xiaoshouzhangdetail['total'] = i.totalAccount
+            xiaoshouzhanglist.append(xiaoshouzhangdetail)
+        data['xiaoshouzhanglist'] = xiaoshouzhanglist
+        data['realname'] = username
+        return render(req, 'admin_xiaoshouzhangguanli.html', data)
+
+#mkx-采购帐
+def admin_caigouzhangguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        caigouzhang = Purchase_account.objects.all()
+        caigouzhanglist = []
+
+        for i in caigouzhang:
+            caigouzhangdetail={}
+            caigouzhangdetail['id']= i.id
+            caigouzhangdetail['pbid'] = Payable.objects.get(id=i.payable_id).id
+            caigouzhangdetail['time'] = i.addTime
+            caigouzhangdetail['total'] = i.totalAccount
+            caigouzhanglist.append(caigouzhangdetail)
+        data['caigouzhanglist'] = caigouzhanglist
+        data['realname'] = username
+        return render(req, 'admin_caigouzhangguanli.html', data)
 
 @csrf_exempt
 def admin_userdelete(req):

@@ -2,9 +2,8 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            管理员>客户管理
+            管理员>财务管理>采购帐管理
              <span class="smart-widget-option">
-                <button data-target="#addcustomer" data-toggle="modal" class="btn btn-info btn-sm">添加客户</button>
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
@@ -22,53 +21,6 @@
                 </a>
             </span>
         </div>
-
-        <!-- addcustomer-->
-		<div class="modal fade" id="addcustomer" aria-hidden="true">
-		  	<div class="modal-dialog modal-sm">
-		    	<div class="modal-content">
-		      		<div class="modal-header">
-		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">添加新客户</h4>
-		      		</div>
-		      		<div class="modal-body">
-		        		<form  id='customeraddform' method="post" role="form" class="form-horizontal">
-				  			<div class="form-group">
-				    			<label class="control-label col-sm-3" for="customername">客户姓名</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="customername" placeholder="请输入客户姓名">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-							    <label class="control-label col-sm-3" for="customeraddress">客户地址</label>
-                                 <div class="col-sm-8">
-                                     <input  class="form-control" id="customeraddress" placeholder="请输入地址">
-                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-3" for="phone">联系电话</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="phone" placeholder="请输入联系电话">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-3" for="email">邮箱</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="email" placeholder="请输入邮箱">
-                                </div>
-				  			</div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">
-                                </div>
-				  			</div>
-		        		</form>
-                        <a id='addcustomer'class="btn btn-danger block m-top-md">添加</a>
-		      		</div>
-		    	</div>
-		  	</div>
-		</div>
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
                 <ul class="widget-color-list clearfix">
@@ -88,30 +40,26 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>客户编号</th>
-                        <th>客户姓名</th>
-                        <th>客户地址</th>
-                        <th>联系电话</th>
-                        <th>邮箱</th>
-                        <th>客户信用水平</th>
+                        <th>采购帐编号</th>
+                        <th>应付帐编号</th>
+                        <th>开单时间</th>
+                        <th>应收总额</th>
                         <th>操作</th>
 
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in customerlist %}
+                    {% for i in caigouzhanglist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.customername }}</td>
-                            <td>{{ i.customeraddress }}</td>
-                            <td>{{ i.phone }}</td>
-                            <td>{{ i.email }}</td>
-                            <td>{{ i.credit }}</td>
+                            <td>{{ i.pbid }}</td>
+                            <td>{{ i.time }}</td>
+                            <td>{{ i.total }}</td>
+
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">修改信用水平</button>
-
+                            <button class="btn btn-info btn-xs zhifu">查看详情</button>
                             </td>
                         </tr>
                     {% endfor %}
