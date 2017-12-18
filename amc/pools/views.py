@@ -12,10 +12,15 @@ import json
 
 # Create your views here.
 
+#mkx-index
+def index(req):
+    if req.method == 'GET':
+        return render(req, 'amc_index.html', {})
+
 @csrf_exempt
 def login(req):
     if req.method == 'GET':
-        return render(req, 'signin.html', {})
+        return render(req, 'login.html', {})
     else:
         username = req.POST.get('name')
         password = req.POST.get('password')
@@ -38,9 +43,9 @@ def login(req):
             elif userRoleid == 5:
                 return render(req, 'caigou_base.html', data)
             else:
-                return render(req, 'signin.html', {})
+                return render(req, 'login.html', {})
         else:
-            return render(req, 'signin.html', {} )
+            return render(req, 'login.html', {} )
 
 
 @csrf_exempt
