@@ -1,8 +1,8 @@
-{% extends 'admin_base.html' %}
+{% extends base_template %}
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            管理员>产品管理
+            管理员>应付账款管理
              <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
@@ -40,35 +40,32 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>产品编号</th>
-                        <th>产品名称</th>
-                        <th>产品规格</th>
-                        <th>现有库存</th>
-                        <th>安全库存</th>
-                        <th>购买价格</th>
-                        <th>销售价格</th>
-                        <th>供应商编号</th>
+                        <th>应付账编号</th>
+                        <th>采购单编号</th>
+                        <th>开单时间</th>
+                        <th>付款状态</th>
+                        <th>发票状态</th>
+                        <th>应付总额</th>
                         <th>操作</th>
 
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in productlist %}
+                    {% for i in yingfuzhanglist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.productname }}</td>
-                            <td>{{ i.productsize }}</td>
-                            <td>{{ i.stock }}</td>
-                            <td>{{ i.safestock }}</td>
-                            <td>{{ i.purchaseprice }}</td>
-                            <td>{{ i.salesprice }}</td>
-                            <td>{{ i.supplierid }}</td>
+                            <td>{{ i.cgid }}</td>
+                            <td>{{ i.time }}</td>
+                            <td>{{ i.paystatus }}</td>
+                            <td>{{ i.invoicestatus }}</td>
+                            <td>{{ i.total }}</td>
 
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">修改库存数量</button>
-
+                            <button class="btn btn-info btn-xs zhifu">查看详情</button>
+                            <button class="btn btn-info btn-xs zhifu">确认付款</button>
+                            <button class="btn btn-info btn-xs zhifu">确认收到发票</button>
                             </td>
                         </tr>
                     {% endfor %}

@@ -37,7 +37,7 @@ def login(req):
             elif userRoleid ==2:
                 return render(req, 'sales_base.html', data)
             elif userRoleid == 3:
-                return render(req, 'cangchu_base.html', data)
+                return render(req, 'kucun_base.html', data)
             elif userRoleid == 4:
                 return render(req, 'caiwu_base.html', data)
             elif userRoleid == 5:
@@ -47,7 +47,7 @@ def login(req):
         else:
             return render(req, 'login.html', {} )
 
-
+#用户管理
 @csrf_exempt
 def admin_usermanage(req):
     if req.method == 'GET':
@@ -69,24 +69,24 @@ def admin_usermanage(req):
         data['username'] = username
         return render(req, 'admin_usermanage.html', data)
     else:
-        print "keyile"
         username = req.POST.get('username')
         password = req.POST.get('password')
         realname = req.POST.get('realname')
         userdepart = req.POST.get('userdepart')
         juese = req.POST.get('juese')
         User.objects.create(userName=username,userPassword=password,realName=realname,userDepart=userdepart,userRole_id=juese)
-        print "keyile2"
         data ={}
         data['id'] = User.objects.get(userName = username).id
-        data['username'] = username;
-        data['realname'] = realname;
-        data['userdepart'] = userdepart;
-        data['juese'] = juese;
-        data['result'] = 'post_success';
+        data['username'] = username
+        data['realname'] = realname
+        data['userdepart'] = userdepart
+        data['juese'] = juese
+        data['result'] = 'post_success'
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-def admin_salesmanage(req):
+# wtq add-销售管理
+#销售管理--订单管理
+def sales_ordermanage(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -103,9 +103,16 @@ def admin_salesmanage(req):
             saleslist.append(salesdetail)
         data['saleslist'] = saleslist
         data['realname'] = username
-        return render(req, 'admin_salesmanage.html', data)
+        user = User.objects.get(userName=username)
+        if user.userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
+        return render(req, 'sales_ordermanage.html', data)
 
-def admin_customermanage(req):
+#销售管理-客户管理
+def sales_customermanage(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -122,16 +129,20 @@ def admin_customermanage(req):
             customerlist.append(customerdetail)
         data['customerlist'] = customerlist
         data['realname'] = username
-        return render(req, 'admin_customermanage.html', data)
+        user = User.objects.get(userName=username)
+        if user.userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
+        return render(req, 'sales_customermanage.html', data)
     else:
-        print "keyile"
         customername = req.POST.get('customername')
         customeraddress = req.POST.get('customeraddress')
         phone = req.POST.get('phone')
         email = req.POST.get('email')
         credit = req.POST.get('credit')
         Customer.objects.create(customerName=customername,address=customeraddress,phone=phone,email=email,credit=credit)
-        print "keyile2"
         data ={}
         data['id'] = Customer.objects.get(customerName = customername).id
         data['customerName'] = customername;
@@ -142,7 +153,8 @@ def admin_customermanage(req):
         data['result'] = 'post_success';
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-def admin_chanpinguanli(req):
+#库存管理--产品管理
+def kucun_chanpinguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -162,10 +174,16 @@ def admin_chanpinguanli(req):
             productlist.append(productdetail)
         data['productlist'] = productlist
         data['realname'] = username
-        return render(req, 'admin_chanpinguanli.html', data)
+        user = User.objects.get(userName=username)
+        if user.userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'kucun_base.html'
+        data['base_template'] = base_template
+        return render(req, 'kucun_chanpinguanli.html', data)
 
-
-def admin_beihuodanmanage(req):
+#库存管理-备货单管理
+def kucun_beihuodanmanage(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -184,10 +202,16 @@ def admin_beihuodanmanage(req):
             beihuodanlist.append(beihuodandetail)
         data['beihuodanlist'] = beihuodanlist
         data['realname'] = username
-        return render(req, 'admin_beihuodanmanage.html', data)
+        user = User.objects.get(userName=username)
+        if user.userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'kucun_base.html'
+        data['base_template'] = base_template
+        return render(req, 'kucun_beihuodanmanage.html', data)
 
-
-def admin_jinhuodanguanli(req):
+#库存管理-进货单管理
+def kucun_jinhuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -205,10 +229,15 @@ def admin_jinhuodanguanli(req):
             jinhuodanlist.append(jinhuodandetail)
         data['jinhuodanlist'] = jinhuodanlist
         data['realname'] = username
-        return render(req, 'admin_jinhuodanguanli.html', data)
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'kucun_base.html'
+        data['base_template'] = base_template
+        return render(req, 'kucun_jinhuodanguanli.html', data)
 
-
-def admin_fahuodanguanli(req):
+#库存管理-发货单管理
+def kucun_fahuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -227,10 +256,16 @@ def admin_fahuodanguanli(req):
             fahuodanlist.append(fahuodandetail)
         data['fahuodanlist'] = fahuodanlist
         data['realname'] = username
-        return render(req, 'admin_fahuodanguanli.html', data)
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'kucun_base.html'
+        data['base_template'] = base_template
+        return render(req, 'kucun_fahuodanguanli.html', data)
 
 #mkx-缺货单
-def admin_quehuodanguanli(req):
+#采购管理-缺货单管理
+def caigou_quehuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -250,10 +285,15 @@ def admin_quehuodanguanli(req):
             quehuodanlist.append(quehuodandetail)
         data['quehuodanlist'] = quehuodanlist
         data['realname'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
         return render(req, 'admin_quehuodanguanli.html', data)
 
 #mkx-再订货单
-def admin_zaidinghuodanguanli(req):
+def caigou_zaidinghuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -273,6 +313,11 @@ def admin_zaidinghuodanguanli(req):
             zaidinghuodanlist.append(zaidinghuodandetail)
         data['zaidinghuodanlist'] = zaidinghuodanlist
         data['realname'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
         return render(req, 'admin_zaidinghuodanguanli.html', data)
 
 #mkx-采购订单
@@ -298,7 +343,7 @@ def admin_zaidinghuodanguanli(req):
 #        data['realname'] = username
 #        return render(req, 'admin_caigoudingdanguanli.html', data)
 
-def admin_gongyingshangguanli(req):
+def caigou_gongyingshangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -315,9 +360,14 @@ def admin_gongyingshangguanli(req):
             supplierlist.append(supplierdetail)
         data['supplierlist'] = supplierlist
         data['realname'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
         return render(req, 'admin_gongyingshangguanli.html', data)
 
-def admin_yingfuzhangfuanli(req):
+def caiwu_yingfuzhangfuanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -335,10 +385,15 @@ def admin_yingfuzhangfuanli(req):
             yingfuzhanglist.append(yingfuzhangdetail)
         data['yingfuzhanglist'] = yingfuzhanglist
         data['realname'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
         return render(req, 'admin_yingfuzhangfuanli.html', data)
 
 #mkx-应收帐
-def admin_yingshouzhangguanli(req):
+def caiwu_yingshouzhangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -355,10 +410,15 @@ def admin_yingshouzhangguanli(req):
             yingshouzhanglist.append(yingshouzhangdetail)
         data['yingshouzhanglist'] = yingshouzhanglist
         data['realname'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
         return render(req, 'admin_yingshouzhangguanli.html', data)
 
 #mkx-销售帐
-def admin_xiaoshouzhangguanli(req):
+def caiwu_xiaoshouzhangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -374,10 +434,15 @@ def admin_xiaoshouzhangguanli(req):
             xiaoshouzhanglist.append(xiaoshouzhangdetail)
         data['xiaoshouzhanglist'] = xiaoshouzhanglist
         data['realname'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
         return render(req, 'admin_xiaoshouzhangguanli.html', data)
 
 #mkx-采购帐
-def admin_caigouzhangguanli(req):
+def caiwu_caigouzhangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
@@ -393,6 +458,11 @@ def admin_caigouzhangguanli(req):
             caigouzhanglist.append(caigouzhangdetail)
         data['caigouzhanglist'] = caigouzhanglist
         data['realname'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'sales_base.html'
+        data['base_template'] = base_template
         return render(req, 'admin_caigouzhangguanli.html', data)
 
 @csrf_exempt
@@ -427,25 +497,7 @@ def lockscreen(req):
     data['username']=username
     return render(req, 'lockscreen.html', data)
 
-#wtq add-销售管理
-def sales_ordermanage(req):
-    if req.method == 'GET':
-        username = req.session['username']
-        data={}
-        sales = Order.objects.all()
-        saleslist = []
-        for i in sales:
-            salesdetail={}
-            salesdetail['id']= i.id
-            salesdetail['user']= i.user.realName
-            salesdetail['customername'] = i.customer.customerName
-            salesdetail['receaddress'] = i.receAddress
-            salesdetail['ordertime']= i.orderTime
-            salesdetail['status'] = i.status
-            saleslist.append(salesdetail)
-        data['saleslist'] = saleslist
-        data['realname'] = username
-        return render(req, 'sales_ordermanage.html', data)
+
 
 @csrf_exempt
 def sales_orderzhifu(req):

@@ -1,8 +1,8 @@
-{% extends 'admin_base.html' %}
+{% extends base_template %}
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            管理员>订单管理
+            管理员>采购管理>缺货单管理
              <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
@@ -40,29 +40,33 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
+                        <th>缺货单编号</th>
                         <th>订单编号</th>
-                        <th>添加人员</th>
-                        <th>顾客姓名</th>
-                        <th>收货地址</th>
-                        <th>下单时间</th>
-                        <th>订单状态</th>
+                        <th>添加时间</th>
+                        <th>缺货产品名称</th>
+                        <th>缺货数量</th>
+                        <th>缺货单状态</th>
+                        <th>添加用户</th>
                         <th>操作</th>
+
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in saleslist %}
+                    {% for i in quehuodanlist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.user }}</td>
-                            <td>{{ i.customername }}</td>
-                            <td>{{ i.receaddress }}</td>
-                            <td>{{ i.ordertime|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ i.oid }}</td>
+                            <td>{{ i.time }}</td>
+                            <td>{{ i.pname }}</td>
+                            <td>{{ i.qnum }}</td>
                             <td>{{ i.status }}</td>
+                            <td>{{ i.user }}</td>
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">修改订单状态</button>
-
+                            <button class="btn btn-info btn-xs zhifu">修改</button>
+                            <button class="btn btn-info btn-xs zhifu">查看</button>
+                            <button class="btn btn-info btn-xs zhifu">删除</button>
                             </td>
                         </tr>
                     {% endfor %}
