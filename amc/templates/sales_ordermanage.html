@@ -4,6 +4,8 @@
         <div class="smart-widget-header">
             销售管理>订单管理
             <span class="smart-widget-option">
+                <button data-target="#addorder" data-toggle="modal" class="btn btn-info btn-sm">添加订单</button>
+
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
@@ -36,6 +38,84 @@
 					<li style="background-color:#fff;" data-color="reset"></li>
                 </ul>
             </div>
+        <!-- Modal -->
+		<div class="modal fade" id="addorder">
+		  	<div class="modal-dialog">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+				        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+				        <h4 class="modal-title" id="myModalLabel">添加订单</h4>
+		      		</div>
+		      		<div class="modal-body">
+                        <form  id='orderaddform' action="/pools/sales_addorder/" method="post" class="form-horizontal">
+                        <input type="hidden" name = "username"  value = {{ username }}>
+                        <input type="hidden" name = "rows"  value = 1>
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-2" for="customername">客户姓名</label>
+                                <div class="col-sm-4">
+                                    <select  id="customername" class="form-control">
+                                                {% for i in customerlist %}
+                                                    <option value = {{ i }}>{{ i }} </option>
+                                                {% endfor %}
+                                            </select>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-2" for="customername">收货人姓名</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="shouhuoname"  name="shouhuoname" placeholder="请输入收货人姓名">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="customeraddress">收货地址</label>
+                                <div class="col-sm-8">
+                                    <input  class="form-control" id="customeraddress" name="customeraddress" placeholder="请输入收货地址">
+                                </div>
+                            </div>
+                            <hr>
+                            <table id="product" class="table table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>产品名称</th>
+                                        <th>产品数量</th>
+                                        <th>操作<th>
+                                    </tr>
+                                </thead>
+                                <tbody id = "productbody">
+                                    <tr >
+                                        <td>
+                                            <select  id="productname0" class="form-control">
+                                                {% for i in productlist %}
+                                                    <option value = {{ i }}>{{ i }} </option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input  class="form-control" id="productnum0" placeholder="请输入数量">
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <div  class="fa fa-plus-circle fa-lg" style="margin-left: 30px"> </div>
+                                                <div  class="fa fa-minus-circle fa-lg" style="margin-left: 50px"> </div>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <iframe id="id_iframe" name="id_iframe" style="display: none;">
+                        </iframe>
+		      		</div>
+		      		<div class="modal-footer">
+				        <button id="addproduct" type="button" class="btn btn-success">添加</button>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
             <div class="smart-widget-body">
                 <table class="table table-bordered">
                     <thead>
@@ -46,6 +126,7 @@
                         <th>收货地址</th>
                         <th>下单时间</th>
                         <th>订单状态</th>
+                        <th>修改状态</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -59,13 +140,16 @@
                             <td>{{ i.ordertime|date:"Y-m-d H:i:s" }}</td>
                             <td>{{ i.status }}</td>
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">已支付</button>
+                                <button class="btn btn-info btn-xs zhifu">已支付</button>
                                 <button class="btn btn-info btn-xs chuli">已处理</button>
-                                 <button class="btn btn-info btn-xs wancheng">已完成</button>
+                                <button class="btn btn-info btn-xs wancheng">已完成</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-info btn-xs xiugai">修改</button>
+                                <button class="btn btn-info btn-xs del">删除</button>
                             </td>
                         </tr>
                     {% endfor %}
-
                     </tbody>
                 </table>
             </div>
@@ -86,23 +170,196 @@
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
         $('.zhifu').on('click',function () {
-            var tr = $(this).parents("tr")
-            var id = tr.attr("id")
+            var sta = $(this).parent().prev().get(0);
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
             $.ajax({
-                url: '/pools/sales_orderzhifu',
+                url: '/pools/sales_ordermanage',
                 type: 'POST',
-                data: {orderid: id},
+                data: {'orderid': id,'status':"已支付"},
                 dataType: 'json',
                 timeout: 10000,
                 success: function (result) {
-                    if (result.result == "post_success") {
-                        window.location.reload();
+                    if (result == "post_success") {
+                        sta.innerHTML = "已支付";
                     } else {
-                        alert('修改未成功');
+                        alert('操作未成功');
                     }
                 }
             });
-        })
-    </script>
+        });
+        $('.chuli').on('click',function () {
+            var sta = $(this).parent().prev().get(0);
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                url: '/pools/sales_ordermanage',
+                type: 'POST',
+                data: {'orderid': id,'status':"已处理"},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (result) {
+                    if (result == "post_success") {
+                        sta.innerHTML = "已处理";
+                    } else {
+                        alert('操作未成功');
+                    }
+                }
+            });
+        });
+        $('.wancheng').on('click',function () {
+            var sta = $(this).parent().prev().get(0);
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                url: '/pools/sales_ordermanage',
+                type: 'POST',
+                data: {'orderid': id,'status':"已完成"},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (result) {
+                    if (result == "post_success") {
+                        sta.innerHTML = "已完成";
+                    } else {
+                        alert('操作未成功');
+                    }
+                }
+            });
+        });
+    $('#productbody').delegate('.fa-plus-circle','click',function(){
+        var rows = $("#product").find('tr').length-1;
+        $('#productbody').append(
+            '<tr>'+
+            '<td>'+
+                '<select id="productname'+rows+'" class="form-control">'+
+                '{% for i in productlist %}'+
+                    '<option value = {{ i }}>'+'{{ i }}'+'</option>'+
+                '{% endfor %}'+
+                '</select>'+
+            '</td>'+
+            '<td>'+
+                '<input type="text" id="productnum'+rows+'" class="form-control" placeholder="请输入数量">'+
+            '</td>'+
+            '<td>'+
+                '<div class="form-group">' +
+                    '<div  class="fa fa-plus-circle fa-lg" style="margin-left: 30px"> </div> ' +
+                    '<div  class="fa fa-minus-circle fa-lg" style="margin-left: 50px"> </div> ' +
+                '</div>'+
+            '</td>'+
+            '</tr>');
+        $('input[name="rows"]').val(rows+1);
 
+    });
+    $('#productbody').delegate('.fa-minus-circle','click',function(){
+        var rows = $("#product").find('tr').length;
+        if(rows>2){
+            $(this).parents('tr').remove();
+            $('input[name="rows"]').val(rows-1);
+
+
+            $('#product').find('tr').each(function () {
+                var index = $(this).index();
+                $(this).find('select').attr('id','productname'+index);
+                $(this).find('input').attr('id','productnum'+index);
+            })
+        }
+    });
+    $('#addproduct').on('click',function () {
+        data={};
+        data['rows'] = $('input[name = "rows"]').val();
+        data['customername'] = $('#customername option:selected').val();
+        data['shouhuoname'] =$('#shouhuoname').val();
+        data['customeraddress'] = $('#customeraddress').val();
+        var i = 0
+        $('#product').find('tr').each(function(){
+            var proname = 'productname'+ i;
+            var pronum = 'productnum'+i;
+            data[proname]=$('#'+proname).val();
+            data[pronum] =$('#'+pronum).val();
+            i+=1;
+        });
+
+        $.ajax({
+                url: '/pools/sales_addorder',
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                timeout: 10000,
+                success: function (data) {
+                    if (data == "post_success") {
+                        window.location.reload();
+                    } else {
+                        alert('操作未成功');
+                    }
+                }
+            });
+
+{#        $('#orderaddform').submit();#}
+    });
+    $('.del').on('click',function(){
+        var r=confirm("警告：您确定要删除此订单吗？（此操作不可恢复）");
+        if (r==true) {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                url: '/pools/sales_delorder',
+                type: 'POST',
+                data: {id: id},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (data) {
+                    if (data.result == "post_success") {
+                        document.getElementById(data.id).remove();
+                    } else {
+                        alert('删除未成功');
+                    }
+                }
+            });
+        }
+
+    })
+    </script>
 {% endblock %}
+
+<!-- 控制逐行添加产品 -->
+{#<script>#}
+{#    ProductFieldCount=1;#}
+{#    function addProduct(e)  #}
+{#    {#}
+{#        var InputWrapper   = $("#inputWrapper");#}
+{##}
+{#        // console.log('pressed');#}
+{#         #}
+{#        $(InputWrapper).append('<tr id="product-'+(++ProductFieldCount)+'">\n'+#}
+{#            '                                        <td>\n'+#}
+{#            '                                            <select id="product-name" name="product-name'+ProductFieldCount+'" class="form-control">\n'+#}
+{#            '                                                <c:forEach items="${productList}" var="p">\n'+#}
+{#            '                                                <option value ="${p.productId}">${p.productName}</option>\n'+#}
+{#            '                                                </c:forEach>'+#}
+{#            '                                            </select>\n'+#}
+{#            '                                        </td>\n'+#}
+{#            '                                        <td>\n'+#}
+{#            '                                            <input type="text" id="quantity" name="quantity'+ProductFieldCount+'" class="form-control">\n'+#}
+{#            '                                        </td>\n'+#}
+{#            '                                        <td>\n'+#}
+{#            '                                            <a href="#" class="remove">\n'+#}
+{#            '                                                <span class="fa fa-remove"></span>\n'+#}
+{#            '                                            </a>\n'+#}
+{#            '                                        </td>\n'+#}
+{#            '                                    </tr>');#}
+{#        $("#count").val(ProductFieldCount);#}
+{#        return false;  #}
+{#    };  #}
+{#    $("#ad").click(function () {#}
+{#        $("#count").attr("value",ProductFieldCount);#}
+{#    })#}
+{#    $("rm").click()(function () {#}
+{#        $("#count").attr("value",ProductFieldCount);#}
+{#    })#}
+{#    $("body").on("click",".remove", function(e){#}
+{#        // console.log('pressed'#}
+{#        ProductFieldCount--;#}
+{#        $(this).parent('td').parent('tr').remove();#}
+{#        return false;  #}
+{#    })#}
+{#</script>#}

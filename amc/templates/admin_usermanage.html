@@ -2,9 +2,9 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-           管理员>用户管理
+           管理员 > 用户管理
             <span class="smart-widget-option">
-                <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm">添加用户</button>
+                <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加用户</button>
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
@@ -215,17 +215,8 @@
                     dataType: 'json',
                     timeout: 10000,
                     success: function(result) {
-                        if ( result.result == "post_success" ) {
+                        if ( result == "post_success" ) {
                             window.location.reload();
-{#                            alert("发起成功");#}
-{#                            var table = $("#usertable")#}
-{#                            var rows = table.rows.length#}
-{#                            var id = result.id#}
-{#                            var item = "<tr id="+id+"><td>"+id+"</td><td>"+username+"</td><td>"+realname+"</td><td>"#}
-{#                            +userdepart+"</td><td>"+juese+"</td><td><button type='button' class='btn btn-info btn-xs'>" +#}
-{#                                    "删除</button><button type='button' class='btn btn-info btn-xs'>修改</button></td></tr>"#}
-{#                            table.append(item)#}
-
                         }else {
                             alert('未成功');
                         }
@@ -299,17 +290,8 @@
                     dataType: 'json',
                     timeout: 10000,
                     success: function(result) {
-                        if ( result.result == "post_success" ) {
+                        if ( result == "post_success" ) {
                             window.location.reload();
-{#                            alert("发起成功");#}
-{#                            var table = $("#usertable")#}
-{#                            var rows = table.rows.length#}
-{#                            var id = result.id#}
-{#                            var item = "<tr id="+id+"><td>"+id+"</td><td>"+username+"</td><td>"+realname+"</td><td>"#}
-{#                            +userdepart+"</td><td>"+juese+"</td><td><button type='button' class='btn btn-info btn-xs'>" +#}
-{#                                    "删除</button><button type='button' class='btn btn-info btn-xs'>修改</button></td></tr>"#}
-{#                            table.append(item)#}
-
                         }else {
                             alert('修改未成功');
                         }

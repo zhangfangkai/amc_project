@@ -7,10 +7,21 @@ urlpatterns = [
     url(r'^login', login),
 #用户管理
     url(r'^admin_usermanage', admin_usermanage),
+    url(r'^admin_userdelete', admin_userdelete),
+    url(r'^admin_modify', admin_modify),
 #销售管理
     url(r'^sales_customermanage', sales_customermanage),
     url(r'^sales_ordermanage', sales_ordermanage),
-#库存管理
+    url(r'^sales_customerdel',sales_customerdel),
+    url(r'^sales_customermodify', sales_customermodify),
+
+    url(r'^sales_addorder', sales_addorder),
+    url(r'^sales_delorder', sales_delorder),
+
+
+
+
+    #库存管理
     url(r'^kucun_beihuodanmanage', kucun_beihuodanmanage),
     url(r'^kucun_chanpinguanli', kucun_chanpinguanli),
     url(r'^kucun_fahuodanguanli', kucun_fahuodanguanli),
@@ -25,10 +36,7 @@ urlpatterns = [
     url(r'^caiwu_yingfuzhangfuanli', caiwu_yingfuzhangfuanli),
     url(r'^caiwu_xiaoshouzhangguanli', caiwu_xiaoshouzhangguanli),
     url(r'^caiwu_caigouzhangguanli', caiwu_caigouzhangguanli),
-
-
+#锁屏
     url(r'^lockscreen', lockscreen),
-    url(r'^sales_orderzhifu', sales_orderzhifu),
-    url(r'^admin_userdelete', admin_userdelete),
-    url(r'^admin_modify', admin_modify),
+
 ]

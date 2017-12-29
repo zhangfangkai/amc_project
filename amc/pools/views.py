@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 import json
+from django.utils import timezone
+
 
 
 # Create your views here.
@@ -75,22 +77,45 @@ def admin_usermanage(req):
         userdepart = req.POST.get('userdepart')
         juese = req.POST.get('juese')
         User.objects.create(userName=username,userPassword=password,realName=realname,userDepart=userdepart,userRole_id=juese)
-        data ={}
-        data['id'] = User.objects.get(userName = username).id
-        data['username'] = username
-        data['realname'] = realname
-        data['userdepart'] = userdepart
-        data['juese'] = juese
-        data['result'] = 'post_success'
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+@csrf_exempt
+def admin_userdelete(req):
+    if req.method == 'POST':
+        print "keyi shanchu"
+        user_id = req.POST.get('userid')
+        User.objects.filter(id=user_id).delete()
+        data = {}
+        data['result'] = 'post_success';
+        data['id'] = user_id
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+@csrf_exempt
+def admin_modify(req):
+    if req.method == 'POST':
+        print "keyixiugai"
+        username = req.POST.get('username')
+        password = req.POST.get('password')
+        realname = req.POST.get('realname')
+        userdepart = req.POST.get('userdepart')
+        juese = req.POST.get('juese')
+        user_id = req.POST.get('userid')
+        User.objects.filter(id=user_id).update(userName=username, userPassword=password, realName=realname,
+                                               userDepart=userdepart, userRole_id=juese)
+
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
 
 # wtq add-销售管理
 #销售管理--订单管理
+@csrf_exempt
 def sales_ordermanage(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        sales = Order.objects.all()
+        data['username']=username
+        sales = Order.objects.all().order_by("-orderTime")
         saleslist = []
         for i in sales:
             salesdetail={}
@@ -103,6 +128,16 @@ def sales_ordermanage(req):
             saleslist.append(salesdetail)
         data['saleslist'] = saleslist
         data['realname'] = username
+        customerlist=[]
+        customer = Customer.objects.all()
+        for j in customer:
+            customerlist.append(j.customerName)
+        data['customerlist']= customerlist
+        product = Product.objects.all()
+        productlist=[]
+        for k in product:
+            productlist.append(k.productName)
+        data['productlist']=productlist
         user = User.objects.get(userName=username)
         if user.userRole_id == 1:
             base_template = 'admin_base.html'
@@ -110,8 +145,58 @@ def sales_ordermanage(req):
             base_template = 'sales_base.html'
         data['base_template'] = base_template
         return render(req, 'sales_ordermanage.html', data)
+    else:
+        orderid=req.POST.get('orderid')
+        status = req.POST.get('status')
+        Order.objects.filter(id=orderid).update(status=status)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 销售管理-增加订单
+@csrf_exempt
+def sales_addorder(req):
+    if req.method == "POST":
+        rows = req.POST.get('rows')
+        username = req.session['username']
+        user = User.objects.get(userName=username)
+        customername = req.POST.get('customername')
+        customeraddress = req.POST.get('customeraddress')
+        shouhuoname = req.POST.get('shouhuoname')
+        customer = Customer.objects.get(customerName=customername)
+        order = customer.order_set.create(receAddress=customeraddress, receiver=shouhuoname,
+                                          orderTime=timezone.now(), status="已提交", user=user, outDemandTimes=0)
+        for i in range(0, int(rows)):
+            tempproname = 'productname' + str(i)
+            temppronum = 'productnum' + str(i)
+            productname = req.POST.get(tempproname)
+            productnum = req.POST.get(temppronum)
+            product = Product.objects.filter(productName=productname)[0]
+            print i, productname, productnum
+            order.order_detail_set.create(product=product, orderNum=productnum)
+            print "keyi"
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 销售管理-删除订单
+@csrf_exempt
+def sales_delorder(req):
+    if req.method == "POST":
+        id = req.POST.get('id')
+        order = Order.objects.get(id = id)
+        orderdetail = order.order_detail_set.all()
+        for i in orderdetail:
+            i.delete()
+        order.delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+
 
 #销售管理-客户管理
+@csrf_exempt
 def sales_customermanage(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -141,17 +226,37 @@ def sales_customermanage(req):
         customeraddress = req.POST.get('customeraddress')
         phone = req.POST.get('phone')
         email = req.POST.get('email')
-        credit = req.POST.get('credit')
-        Customer.objects.create(customerName=customername,address=customeraddress,phone=phone,email=email,credit=credit)
-        data ={}
-        data['id'] = Customer.objects.get(customerName = customername).id
-        data['customerName'] = customername;
-        data['address'] = customeraddress;
-        data['phone'] = phone;
-        data['email'] = email;
-        data['credit'] = credit;
-        data['result'] = 'post_success';
+        Customer.objects.create(customerName=customername,address=customeraddress,phone=phone,email=email,credit=100)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+#销售管理-客户信息修改
+@csrf_exempt
+def sales_customermodify(req):
+    if req.method == 'POST':
+        print "keyixiugai"
+        customername = req.POST.get('customername')
+        customeraddress = req.POST.get('customeraddress')
+        phone = req.POST.get('phone')
+        email = req.POST.get('email')
+        id = req.POST.get('id')
+        Customer.objects.filter(id=id).update(customerName=customername, address=customeraddress, phone=phone,email=email)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+#销售管理-客户删除
+@csrf_exempt
+def sales_customerdel(req):
+    if req.method == 'POST':
+        print "keyi shanchu"
+        id = req.POST.get('id')
+        Customer.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 #库存管理--产品管理
 def kucun_chanpinguanli(req):
@@ -288,11 +393,12 @@ def caigou_quehuodanguanli(req):
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
-            base_template = 'sales_base.html'
+            base_template = 'caigou_base.html'
         data['base_template'] = base_template
-        return render(req, 'admin_quehuodanguanli.html', data)
+        return render(req, 'caigou_quehuodanguanli.html', data)
 
 #mkx-再订货单
+#采购管理-再订货单管理
 def caigou_zaidinghuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -316,9 +422,9 @@ def caigou_zaidinghuodanguanli(req):
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
-            base_template = 'sales_base.html'
+            base_template = 'caigou_base.html'
         data['base_template'] = base_template
-        return render(req, 'admin_zaidinghuodanguanli.html', data)
+        return render(req, 'caigou_zaidinghuodanguanli.html', data)
 
 #mkx-采购订单
 #def admin_caigoudingdanguanli(req):
@@ -343,6 +449,7 @@ def caigou_zaidinghuodanguanli(req):
 #        data['realname'] = username
 #        return render(req, 'admin_caigoudingdanguanli.html', data)
 
+#采购管理-供应商管理
 def caigou_gongyingshangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -363,10 +470,11 @@ def caigou_gongyingshangguanli(req):
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
-            base_template = 'sales_base.html'
+            base_template = 'caigou_base.html'
         data['base_template'] = base_template
-        return render(req, 'admin_gongyingshangguanli.html', data)
+        return render(req, 'caigou_gongyingshangguanli.html', data)
 
+#财务-应付账款管理
 def caiwu_yingfuzhangfuanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -388,11 +496,12 @@ def caiwu_yingfuzhangfuanli(req):
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
-            base_template = 'sales_base.html'
+            base_template = 'caiwu_base.html'
         data['base_template'] = base_template
-        return render(req, 'admin_yingfuzhangfuanli.html', data)
+        return render(req, 'caiwu_yingfuzhangfuanli.html', data)
 
 #mkx-应收帐
+#财务管理-应收账款管理
 def caiwu_yingshouzhangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -413,11 +522,12 @@ def caiwu_yingshouzhangguanli(req):
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
-            base_template = 'sales_base.html'
+            base_template = 'caiwu_base.html'
         data['base_template'] = base_template
-        return render(req, 'admin_yingshouzhangguanli.html', data)
+        return render(req, 'caiwu_yingshouzhangguanli.html', data)
 
 #mkx-销售帐
+#财务管理-销售账款管理
 def caiwu_xiaoshouzhangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -437,11 +547,12 @@ def caiwu_xiaoshouzhangguanli(req):
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
-            base_template = 'sales_base.html'
+            base_template = 'caiwu_base.html'
         data['base_template'] = base_template
-        return render(req, 'admin_xiaoshouzhangguanli.html', data)
+        return render(req, 'caiwu_xiaoshouzhangguanli.html', data)
 
 #mkx-采购帐
+#财务管理-采购帐管理
 def caiwu_caigouzhangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -461,36 +572,11 @@ def caiwu_caigouzhangguanli(req):
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
-            base_template = 'sales_base.html'
+            base_template = 'caiwu_base.html'
         data['base_template'] = base_template
-        return render(req, 'admin_caigouzhangguanli.html', data)
+        return render(req, 'caiwu_caigouzhangguanli.html', data)
 
-@csrf_exempt
-def admin_userdelete(req):
-    if req.method == 'POST':
-        print "keyi shanchu"
-        user_id = req.POST.get('userid')
-        User.objects.filter(id=user_id).delete()
-        data = {}
-        data['result'] = 'post_success';
-        data['id'] = user_id
-        return HttpResponse(json.dumps(data), content_type='application/json')
-
-@csrf_exempt
-def admin_modify(req):
-    if req.method == 'POST':
-        print "keyixiugai"
-        username = req.POST.get('username')
-        password = req.POST.get('password')
-        realname = req.POST.get('realname')
-        userdepart = req.POST.get('userdepart')
-        juese = req.POST.get('juese')
-        user_id = req.POST.get('userid')
-        User.objects.filter(id=user_id).update(userName=username,userPassword=password,realName=realname,userDepart=userdepart,userRole_id=juese)
-        data = {}
-        data['result'] = 'post_success';
-        return HttpResponse(json.dumps(data), content_type='application/json')
-
+#退出锁屏
 def lockscreen(req):
     data={}
     username = req.session['username']
@@ -499,36 +585,5 @@ def lockscreen(req):
 
 
 
-@csrf_exempt
-def sales_orderzhifu(req):
-    if req.method == 'POST':
-        print "keyi shanchu"
-        order_id = req.POST.get('orderid')
-        Order.objects.filter(id=order_id).update(status='已支付')
-        data = {}
-        data['result'] = 'post_success';
-        return HttpResponse(json.dumps(data), content_type='application/json')
-
-#----一般的request和response写法
-# def mainpage(req):
-#     data = {}
-#     try:
-#         user_id = req.session['user_id']
-#         user = User.objects.get(pk=user_id)
-#         data['user_name'] = user.user_name
-#         wenjuanlist = []
-#         for i in Wenjuan.objects.filter(user_id=user_id).all():
-#             wj={}
-#             wj['id']=i.id
-#             wjcishu=Record.objects.filter(wenjuan_id=i.id).all()
-#             wj['wjtime']=i.wj_date
-#             wj['count']=wjcishu.count()
-#             wj['name']=i.wj_name
-#             wenjuanlist.append(wj)
-#         data['wenjuanlist'] = wenjuanlist
-#     except Exception, e:
-#         print e
-#     return render_to_response('mainpage1.html', data, RequestContext(req))
-#----request和response写法示例完毕
 
 
