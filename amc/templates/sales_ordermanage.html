@@ -38,84 +38,112 @@
 					<li style="background-color:#fff;" data-color="reset"></li>
                 </ul>
             </div>
-        <!-- Modal -->
-		<div class="modal fade" id="addorder">
-		  	<div class="modal-dialog">
-		    	<div class="modal-content">
-		      		<div class="modal-header">
-				        <button type="button" class="close" data-dismiss="modal">
-                            <span aria-hidden="true">&times;</span>
-                            <span class="sr-only">Close</span>
-                        </button>
-				        <h4 class="modal-title" id="myModalLabel">添加订单</h4>
-		      		</div>
-		      		<div class="modal-body">
-                        <form  id='orderaddform' action="/pools/sales_addorder/" method="post" class="form-horizontal">
-                        <input type="hidden" name = "username"  value = {{ username }}>
-                        <input type="hidden" name = "rows"  value = 1>
-				  			<div class="form-group">
-				    			<label class="control-label col-sm-2" for="customername">客户姓名</label>
-                                <div class="col-sm-4">
-                                    <select  id="customername" class="form-control">
-                                                {% for i in customerlist %}
-                                                    <option value = {{ i }}>{{ i }} </option>
-                                                {% endfor %}
-                                            </select>
+            <!-- addorder -->
+            <div class="modal fade" id="addorder">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">添加订单</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form  id='orderaddform' action="/pools/sales_addorder/" method="post" class="form-horizontal">
+                            <input type="hidden" name = "username"  value = {{ username }}>
+                            <input type="hidden" name = "rows"  value = 1>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" for="customername">客户姓名</label>
+                                    <div class="col-sm-4">
+                                        <select  id="customername" class="form-control">
+                                                    {% for i in customerlist %}
+                                                        <option value = {{ i }}>{{ i }} </option>
+                                                    {% endfor %}
+                                                </select>
+                                    </div>
                                 </div>
-				  			</div>
-                            <div class="form-group">
-				    			<label class="control-label col-sm-2" for="customername">收货人姓名</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="shouhuoname"  name="shouhuoname" placeholder="请输入收货人姓名">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" for="customername">收货人姓名</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" id="shouhuoname"  name="shouhuoname" placeholder="请输入收货人姓名">
+                                    </div>
                                 </div>
-				  			</div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-2" for="customeraddress">收货地址</label>
-                                <div class="col-sm-8">
-                                    <input  class="form-control" id="customeraddress" name="customeraddress" placeholder="请输入收货地址">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2" for="customeraddress">收货地址</label>
+                                    <div class="col-sm-8">
+                                        <input  class="form-control" id="customeraddress" name="customeraddress" placeholder="请输入收货地址">
+                                    </div>
                                 </div>
-                            </div>
-                            <hr>
-                            <table id="product" class="table table-responsive">
+                                <hr>
+                                <table id="product" class="table table-responsive">
+                                    <thead>
+                                        <tr>
+                                            <th>产品名称</th>
+                                            <th>产品数量</th>
+                                            <th>操作<th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id = "productbody">
+                                        <tr >
+                                            <td>
+                                                <select  id="productname0" class="form-control">
+                                                    {% for i in productlist %}
+                                                        <option value = {{ i }}>{{ i }} </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input  class="form-control" id="productnum0" placeholder="请输入数量">
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <div  class="fa fa-plus-circle fa-lg" style="margin-left: 30px"> </div>
+                                                    <div  class="fa fa-minus-circle fa-lg" style="margin-left: 50px"> </div>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                            <iframe id="id_iframe" name="id_iframe" style="display: none;">
+                            </iframe>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="addproduct" type="button" class="btn btn-success">添加</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <!-- orderdetail -->
+            <div class="modal fade" id="orderdetail">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">订单详情</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table id="orderdetailtable" class="table table-bordered">
                                 <thead>
                                     <tr>
+                                        <th>编号</th>
                                         <th>产品名称</th>
-                                        <th>产品数量</th>
-                                        <th>操作<th>
+                                        <th>产品</th>
                                     </tr>
                                 </thead>
-                                <tbody id = "productbody">
-                                    <tr >
-                                        <td>
-                                            <select  id="productname0" class="form-control">
-                                                {% for i in productlist %}
-                                                    <option value = {{ i }}>{{ i }} </option>
-                                                {% endfor %}
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input  class="form-control" id="productnum0" placeholder="请输入数量">
-                                        </td>
-                                        <td>
-                                            <div class="form-group">
-                                                <div  class="fa fa-plus-circle fa-lg" style="margin-left: 30px"> </div>
-                                                <div  class="fa fa-minus-circle fa-lg" style="margin-left: 50px"> </div>
-                                            </div>
-                                        </td>
+                                <tbody id = "orderdetailbody">
 
-                                    </tr>
                                 </tbody>
                             </table>
-                        </form>
-                        <iframe id="id_iframe" name="id_iframe" style="display: none;">
-                        </iframe>
-		      		</div>
-		      		<div class="modal-footer">
-				        <button id="addproduct" type="button" class="btn btn-success">添加</button>
-		      		</div>
-		    	</div>
-		  	</div>
-		</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="smart-widget-body">
                 <table class="table table-bordered">
                     <thead>
@@ -137,7 +165,7 @@
                             <td>{{ i.user }}</td>
                             <td>{{ i.customername }}</td>
                             <td>{{ i.receaddress }}</td>
-                            <td>{{ i.ordertime|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ i.ordertime|date:"Y-m-d" }}</td>
                             <td>{{ i.status }}</td>
                             <td>
                                 <button class="btn btn-info btn-xs zhifu">已支付</button>
@@ -145,7 +173,7 @@
                                 <button class="btn btn-info btn-xs wancheng">已完成</button>
                             </td>
                             <td>
-                                <button class="btn btn-info btn-xs xiugai">修改</button>
+                                <button class="btn btn-info btn-xs xiangqing">详情</button>
                                 <button class="btn btn-info btn-xs del">删除</button>
                             </td>
                         </tr>
@@ -293,8 +321,6 @@
                     }
                 }
             });
-
-{#        $('#orderaddform').submit();#}
     });
     $('.del').on('click',function(){
         var r=confirm("警告：您确定要删除此订单吗？（此操作不可恢复）");
@@ -316,6 +342,33 @@
                 }
             });
         }
+
+    });
+    $('.xiangqing').on('click',function () {
+        var id = $(this).parents("tr").attr("id");
+        $.ajax({
+            url: '/pools/sales_orderdetail',
+            type: 'POST',
+            data: {id: id},
+            dataType: 'json',
+            timeout: 10000,
+            success: function (data) {
+                if (data.result == "post_success") {
+                    var detail = data.detail;
+                    $('#orderdetailbody').html("");
+                    var str = "";
+                    for (i in detail){
+                        str+="<tr><td>"+ detail[i].id+"</td><td>"+detail[i].name+"</td><td>"+detail[i].num+"</td></tr>"
+                    }
+                    $('#orderdetailbody').append(str);
+                    $("#orderdetail").modal()
+
+
+                } else {
+                    alert('操作未成功');
+                }
+            }
+        })
 
     })
     </script>

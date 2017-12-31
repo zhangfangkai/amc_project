@@ -192,7 +192,24 @@ def sales_delorder(req):
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-
+# 销售管理-订单详情
+@csrf_exempt
+def sales_orderdetail(req):
+    if req.method == "POST":
+        data={}
+        id = req.POST.get('id')
+        order = Order.objects.get(id=id)
+        orderdetail = order.order_detail_set.all()
+        detail= []
+        for i in orderdetail:
+            orderxiangxi = {}
+            orderxiangxi["id"] = i.id
+            orderxiangxi["name"] = i.product.productName
+            orderxiangxi["num"] = i.orderNum
+            detail.append(orderxiangxi)
+        data["detail"] = detail
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 #销售管理-客户管理
@@ -213,7 +230,7 @@ def sales_customermanage(req):
             customerdetail['credit'] = i.credit
             customerlist.append(customerdetail)
         data['customerlist'] = customerlist
-        data['realname'] = username
+        data['username'] = username
         user = User.objects.get(userName=username)
         if user.userRole_id == 1:
             base_template = 'admin_base.html'
@@ -427,27 +444,26 @@ def caigou_zaidinghuodanguanli(req):
         return render(req, 'caigou_zaidinghuodanguanli.html', data)
 
 #mkx-采购订单
-#def admin_caigoudingdanguanli(req):
-#    if req.method == 'GET':
-#        username = req.session['username']
-#        data={}
-#        caigoudingdan = AgainpurchaseDetail.objects.all()
-#        caigoudingdanlist = []
-
-#       for i in caigoudingdan:
-#            caigoudingdandetail={}
-#            caigoudingdandetail['id']= i.id
-#            caigoudingdandetail['pid']= Product.objects.get(id=i.product_id).id
-#            caigoudingdandetail['pname'] = Product.objects.get(id=i.product_id).productName
-#            caigoudingdandetail['pnum'] = i.purchaseNum
-#            caigoudingdandetail['apid'] = i.againpurchase_id #通知单编号
-#            caigoudingdandetail['time'] = Againpurchase.objects.get(id=i.againpurchase_id).addTime
-#            caigoudingdandetail['user'] = Againpurchase.objects.get(id=i.againpurchase_id).user
-#            caigoudingdandetail['state'] = Againpurchase.objects.get(id=i.againpurchase_id).status
-#            caigoudingdanlist.append(caigoudingdandetail)
-#        data['caigoudingdanlist'] = caigoudingdanlist
-#        data['realname'] = username
-#        return render(req, 'admin_caigoudingdanguanli.html', data)
+def admin_caigoudingdanguanli(req):
+   if req.method == 'GET':
+       username = req.session['username']
+       data={}
+       caigoudingdan = AgainpurchaseDetail.objects.all()
+       caigoudingdanlist = []
+      for i in caigoudingdan:
+           caigoudingdandetail={}
+           caigoudingdandetail['id']= i.id
+           caigoudingdandetail['pid']= Product.objects.get(id=i.product_id).id
+           caigoudingdandetail['pname'] = Product.objects.get(id=i.product_id).productName
+           caigoudingdandetail['pnum'] = i.purchaseNum
+           caigoudingdandetail['apid'] = i.againpurchase_id #通知单编号
+           caigoudingdandetail['time'] = Againpurchase.objects.get(id=i.againpurchase_id).addTime
+           caigoudingdandetail['user'] = Againpurchase.objects.get(id=i.againpurchase_id).user
+           caigoudingdandetail['state'] = Againpurchase.objects.get(id=i.againpurchase_id).status
+           caigoudingdanlist.append(caigoudingdandetail)
+       data['caigoudingdanlist'] = caigoudingdanlist
+       data['realname'] = username
+       return render(req, 'admin_caigoudingdanguanli.html', data)
 
 #采购管理-供应商管理
 def caigou_gongyingshangguanli(req):
