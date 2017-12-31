@@ -31,7 +31,7 @@ urlpatterns = [
     url(r'^caigou_gongyingshangguanli', caigou_gongyingshangguanli),
     url(r'^caigou_quehuodanguanli', caigou_quehuodanguanli),
     url(r'^caigou_zaidinghuodanguanli', caigou_zaidinghuodanguanli),
-    url(r'^caigou_caigoudingdanguanli', caigou_caigoudingdanguanli),
+    # url(r'^caigou_caigoudingdanguanli', caigou_caigoudingdanguanli),
 #财务管理
     url(r'^caiwu_yingshouzhangguanli', caiwu_yingshouzhangguanli),
     url(r'^caiwu_yingfuzhangfuanli', caiwu_yingfuzhangfuanli),
