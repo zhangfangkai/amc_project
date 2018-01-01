@@ -4,6 +4,7 @@
         <div class="smart-widget-header">
             管理员>供应商管理
              <span class="smart-widget-option">
+                <button data-target="#addsupplier" data-toggle="modal" class="btn btn-info btn-sm">添加供应商</button>
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
@@ -21,6 +22,133 @@
                 </a>
             </span>
         </div>
+
+        <!-- addsuppier-->
+		<div class="modal fade" id="addsupplier" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">添加新供应商</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='supplieraddform' method="post" role="form" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="suppliercompany">供应商单位名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="suppliercompany" placeholder="请输入供应商单位名称">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="linkman">联系人</label>
+                                 <div class="col-sm-8">
+                                     <input  class="form-control" id="linkman" placeholder="请输入联系人">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="address">联系地址</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="address" placeholder="请输入联系地址">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="phone">联系电话</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="phone" placeholder="请输入联系电话">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="email">电子邮件</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="email" placeholder="请输入电子邮件">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="email">电子邮件</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="email" placeholder="请输入电子邮件">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="productscope">产品范围</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="productscope" placeholder="请输入产品范围">
+                                </div>
+				  			</div>
+{#                            <div class="form-group">#}
+{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
+{#                                <div class="col-sm-8">#}
+{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
+{#                                </div>#}
+{#				  			</div>#}
+		        		</form>
+                        <a id='addsupplier'class="btn btn-danger block m-top-md">添加</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- modicustomer-->
+		<div class="modal fade" id="modisupplier" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">修改供应商信息</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='supplieraddform' method="post" role="form" class="form-horizontal">
+                            <input id="modid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="suppliername">供应商单位名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modsuppliername" placeholder="请输入供应商单位名称">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="linkman">联系人</label>
+                                 <div class="col-sm-8">
+                                     <input  class="form-control" id="modlinkman" placeholder="请输入联系人">
+                                 </div>
+                            </div>
+                            <div class="form-group"><label class="control-label col-sm-3" for="address">联系地址</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modaddress" placeholder="请输入联系地址">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="phone">联系电话</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modphone" placeholder="请输入联系电话">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="email">电子邮件</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modemail" placeholder="请输入电子邮件">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="productscope">产品范围</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modproductscope" placeholder="请输入产品范围">
+                                </div>
+				  			</div>
+{#                            <div class="form-group">#}
+{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
+{#                                <div class="col-sm-8">#}
+{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
+{#                                </div>#}
+{#				  			</div>#}
+		        		</form>
+                        <a id='modsupplier'class="btn btn-danger block m-top-md">修改</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+
+
+
+
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
                 <ul class="widget-color-list clearfix">
@@ -47,6 +175,7 @@
                         <th>联系电话</th>
                         <th>电子邮件</th>
                         <th>产品范围</th>
+                        <th>操作</th>
 
                     </tr>
                     </thead>
@@ -59,9 +188,12 @@
                             <td>{{ i.address }}</td>
                             <td>{{ i.phone }}</td>
                             <td>{{ i.email }}</td>
+                            <td>{{ i.productscope }}</td>
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}
                             <td>
+                                <button class="btn btn-info btn-xs xiugai">修改</button>
+                                <button class="btn btn-info btn-xs del">删除</button>
 
                             </td>
                         </tr>
@@ -86,29 +218,135 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
-     $('.zhifu').on('click',function () {
 
-                var tr = $(this).parents("tr")
-                var id = tr.attr("id")
+        $('#addsupplier').on('click',function(){
+            var suppliercompany = $('#suppliercompany').val();
+            var linkman = $('#linkman').val();
+            var address = $('#address').val();
+            var phone = $('#phone').val();
+            var email = $('#email').val();
+            var productscope = $('#productscope').val();
+            if(suppliercompany==''){
+                $("#suppliercompany").focus();
+            }else if(linkman==''){
+                $("#linkman").focus();
+            }else if(address==''){
+                $("#address").focus();
+            }else if(phone==''){
+                $("#phone").focus();
+            }else if(email==''){
+                $("#email").focus();
+            }else if(productscope==''){
+                $("#productscope").focus();
+            }else{
+                var data = {}
+                data['suppliercompany']=suppliercompany;
+                data['linkman']=linkman;
+                data['address']=address;
+                data['phone']=phone;
+                data['email']=email;
+                data['productscope']=productscope;
                 $.ajax({
-                    url: '/pools/sales_orderzhifu',
+                    url: '/pools/caigou_gongyingshangguanli',
                     type: 'POST',
-                    data: {orderid: id},
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result == "post_success" ) {
+                            window.location.reload();
+                        }else {
+                            alert('未成功');
+                        }
+                    }
+                })
+            }
+        });
+        $('.xiugai').on('click',function (){
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var suppliercompany = tr.children("td").eq(1).text();
+            var linkman = tr.children("td").eq(2).text();
+            var address = tr.children("td").eq(3).text();
+            var phone = tr.children("td").eq(4).text();
+            var email = tr.children("td").eq(5).text();
+            var productscope = tr.children("td").eq(6).text();
+
+            $('#modsuppliercompany').val(suppliercompany);
+            $('#modlinkman').val(linkman);
+            $('#modaddress').val(address);
+            $('#modphone').val(phone);
+            $('#modemail').val(email);
+            $('#modproductscope').val(productscope);
+            $("#modid").val(id)
+            $("#modisupplier").modal()
+        });
+        $('#modsupplier').on('click',function () {
+            var suppliercompany = $('#modsuppliercompany').val();
+            var linkman = $('#modlinkman').val();
+            var address = $('#modaddress').val();
+            var phone = $('#modphone').val();
+            var email = $('#modemail').val();
+            var productscope = $('#modproductscope').val();
+            if(suppliercompany==''){
+                $("#modsuppliercompany").focus();
+            }else if(linkman==''){
+                $("#modlinkman").focus();
+            }else if(address==''){
+                $("#modsaddres").focus();
+            }else if(phone==''){
+                $("#modphone").focus();
+            }else if(email==''){
+                $("#modemail").focus();
+            }else if(productscope==''){
+                $("#modproductscope").focus();
+            }else{
+                var data = {};
+                data['id'] = $("#modid").val();
+                data['suppliercompany']=suppliercompany;
+                data['linkman']=linkman;
+                data['address']=address;
+                data['phone']=phone;
+                data['email']=email;
+                data['productscope']=productscope;
+                $.ajax({
+                    url: '/pools/caigou_suppliermodify',
+                    type: 'POST',
+                    data: data,
                     dataType: 'json',
                     timeout: 10000,
                     success: function (result) {
-                        if (result.result == "post_success") {
-    window.location.reload();
-
+                        if (result == "post_success") {
+                            window.location.reload();
                         } else {
                             alert('修改未成功');
                         }
                     }
+                })
+            }
+        })
+        $('.del').on('click',function () {
+            var r=confirm("警告：您确定要删除此客户吗？（此操作不可恢复）");
+            if (r==true) {
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
+                $.ajax({
+                    url: '/pools/caigou_supplierdel',
+                    type: 'POST',
+                    data: {id: id},
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result.result == "post_success") {
+                            document.getElementById(result.id).remove();
+                        } else {
+                            alert('删除未成功');
+                        }
+                    }
                 });
-
+            }
 
         })
-    </script>
 
-
-{% endblock %}
+</script>
+{% endblock %}block %}

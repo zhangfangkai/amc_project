@@ -304,6 +304,52 @@ def kucun_chanpinguanli(req):
         data['base_template'] = base_template
         return render(req, 'kucun_chanpinguanli.html', data)
 
+    else:
+        productname = req.POST.get('productname')
+        productsize = req.POST.get('productsize')
+        stock = req.POST.get('stock')
+        safestock = req.POST.get('safestock')
+        purchaseprice = req.POST.get('purchaseprice')
+        salesprice = req.POST.get('salesprice')
+        supplierid = req.POST.get('supplierid')
+        Product.objects.create(productName=productname, productSize=productsize, stock=stock, safestock=safestock,
+                               purchasePrice=purchaseprice, saleprice=salesprice, supplier=supplierid)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# 库存管理-产品信息修改
+@csrf_exempt
+def kucun_productmodify(req):
+    if req.method == 'POST':
+        print "keyixiugai"
+        productname = req.POST.get('productname')
+        productsize = req.POST.get('productsize')
+        stock = req.POST.get('stock')
+        safestock = req.POST.get('safestock')
+        purchaseprice = req.POST.get('purchaseprice')
+        salesprice = req.POST.get('salesprice')
+        supplierid = req.POST.get('supplierid')
+        id = req.POST.get('id')
+        Product.objects.filter(id=id).update(productName=productname, productSize=productsize, stock=stock, safestock=safestock,
+                               purchasePrice=purchaseprice, saleprice=salesprice, supplier=supplierid)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# 库存管理_产品删除
+@csrf_exempt
+def kucun_productdel(req):
+    if req.method == 'POST':
+        print "keyi shanchu"
+        id = req.POST.get('id')
+        Product.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 #库存管理-备货单管理
 def kucun_beihuodanmanage(req):
     if req.method == 'GET':
@@ -480,6 +526,7 @@ def caigou_gongyingshangguanli(req):
             supplierdetail['address'] = i.address
             supplierdetail['phone']= i.phone
             supplierdetail['email'] = i.email
+            supplierdetail['productscope'] = i.productScope
             supplierlist.append(supplierdetail)
         data['supplierlist'] = supplierlist
         data['realname'] = username
@@ -489,6 +536,47 @@ def caigou_gongyingshangguanli(req):
             base_template = 'caigou_base.html'
         data['base_template'] = base_template
         return render(req, 'caigou_gongyingshangguanli.html', data)
+    else:
+        suppliercompany = req.POST.get('suppliercompany')
+        linkman = req.POST.get('linkman')
+        address = req.POST.get('address')
+        phone = req.POST.get('phone')
+        email = req.POST.get('email')
+        productscope = req.POST.get('productscope')
+        Supplier.objects.create(supplierName=suppliercompany, linkMan=linkman, address=address, phone=phone, email=email, productScope=productscope)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# 采购管理-供应商信息修改
+@csrf_exempt
+def caigou_suppliermodify(req):
+    if req.method == 'POST':
+        print "keyixiugai"
+        suppliercompany = req.POST.get('suppliercompany')
+        linkman = req.POST.get('linkman')
+        address = req.POST.get('address')
+        phone = req.POST.get('phone')
+        email = req.POST.get('email')
+        productscope = req.POST.get('productscope')
+        id = req.POST.get('id')
+        Supplier.objects.filter(id=id).update(supplierName=suppliercompany, linkMan=linkman, address=address, phone=phone, email=email, productScope=productscope)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# 采购管理_供应商删除
+@csrf_exempt
+def caigou_supplierdel(req):
+    if req.method == 'POST':
+        print "keyi shanchu"
+        id = req.POST.get('id')
+        Supplier.objects.filter(id=id).delete()
+        data = {}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 #财务-应付账款管理
 def caiwu_yingfuzhangfuanli(req):

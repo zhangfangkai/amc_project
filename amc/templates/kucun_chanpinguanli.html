@@ -4,7 +4,8 @@
         <div class="smart-widget-header">
             库存管理>产品管理
              <span class="smart-widget-option">
-                <span class="refresh-icon-animated">
+                <button data-target="#addproduct" data-toggle="modal" class="btn btn-info btn-sm">添加产品</button>
+                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
                 <a href="#" class="widget-toggle-hidden-option">
@@ -21,6 +22,138 @@
                 </a>
             </span>
         </div>
+
+            <!-- addproduct-->
+		<div class="modal fade" id="addproduct" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">添加新产品</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='productaddform' method="post" role="form" class="form-horizontal">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="productname">产品名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="productname" placeholder="请输入产品名称">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="productsize">产品规格</label>
+                                 <div class="col-sm-8">
+                                     <input  class="form-control" id="productsize" placeholder="请输入产品规格">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="stock">现有库存</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="stock" placeholder="请输入现有库存">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="safestock">安全库存</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="safestock" placeholder="请输入安全库存">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="purchaseprice">购买价格</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="purchaseprice" placeholder="请输入购买价格">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="salesprice">销售价格</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="salesprice" placeholder="请输入销售价格">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="supplierid">供应商编号</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="supplierid" placeholder="请输入供应商编号">
+                                </div>
+				  			</div>
+{#                            <div class="form-group">#}
+{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
+{#                                <div class="col-sm-8">#}
+{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
+{#                                </div>#}
+{#				  			</div>#}
+		        		</form>
+                        <a id='addproduct'class="btn btn-danger block m-top-md">添加</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- modiproduct-->
+		<div class="modal fade" id="modiproduct" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">修改产品信息</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='productaddform' method="post" role="form" class="form-horizontal">
+                            <input id="modid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="productname">产品名称</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modproductname" placeholder="请输入产品名称">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="productsize">产品规格</label>
+                                 <div class="col-sm-8">
+                                     <input  class="form-control" id="modproductsize" placeholder="请输入产品规格">
+                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="stock">现有库存</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modstock" placeholder="请输入现有库存">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="safestock">安全库存</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modsafestock" placeholder="请输入安全库存">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="purchaseprice">购买价格</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modpurchaseprice" placeholder="请输入购买价格">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="salesprice">销售价格</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modsalesprice" placeholder="请输入销售价格">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="supplierid">供应商编号</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modsupplierid" placeholder="请输入供应商编号">
+                                </div>
+				  			</div>
+{#                            <div class="form-group">#}
+{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
+{#                                <div class="col-sm-8">#}
+{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
+{#                                </div>#}
+{#				  			</div>#}
+		        		</form>
+                        <a id='modproduct'class="btn btn-danger block m-top-md">修改</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+
+
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
                 <ul class="widget-color-list clearfix">
@@ -67,7 +200,8 @@
 {#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
 {#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">修改库存数量</button>
+                            <button class="btn btn-info btn-xs xiugai">修改</button>
+                            <button class="btn btn-info btn-xs del">删除</button>
 
                             </td>
                         </tr>
@@ -92,30 +226,145 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
      <script type="text/javascript">
-     $('.zhifu').on('click',function () {
 
-                var tr = $(this).parents("tr")
-                var id = tr.attr("id")
+         $('#addproduct').on('click',function(){
+            var productname = $('#productname').val();
+            var productsize = $('#productsize').val();
+            var stock = $('#stock').val();
+            var safestock = $('#safestock').val();
+            var purchaseprice = $('#purchaseprice').val();
+            var salesprice = $('#salesprice').val();
+            var supplierid = $('#suppliered').val();
+            if(productname==''){
+                $("#productname").focus();
+            }else if(productsize==''){
+                $("#productsize").focus();
+            }else if(stock==''){
+                $("#stock").focus();
+            }else if(safestock=='') {
+                $("#safestock").focus();
+            }else if(purchaseprice=='') {
+                $("#purchaseprice").focus();
+            }else if(salesprice=='') {
+                $("#salesprice").focus();
+            }else if(supplierid==''){
+                $("#supplierid").focus();
+            }else{
+                var data = {}
+                data['productname']=productname;
+                data['productsize']=productsize;
+                data['stock']=stock;
+                data['safestock']=safestock;
+                data['purchaseprice']=purchaseprice;
+                data['salesprice']=salesprice;
+                data['supplierid']=supplierid;
                 $.ajax({
-                    url: '/pools/sales_orderzhifu',
+                    url: '/pools/kucun_chanpinguanli',
                     type: 'POST',
-                    data: {orderid: id},
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function(result) {
+                        if ( result == "post_success" ) {
+                            window.location.reload();
+                        }else {
+                            alert('未成功');
+                        }
+                    }
+                })
+            }
+         });
+         $('.xiugai').on('click',function (){
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            var productname = tr.children("td").eq(1).text();
+            var productsize = tr.children("td").eq(2).text();
+            var stock = tr.children("td").eq(3).text();
+            var safestock = tr.children("td").eq(4).text();
+            var purchaseprice = tr.children("td").eq(5).text();
+            var salesprice = tr.children("td").eq(6).text();
+            var supplierid = tr.children("td").eq(7).text();
+
+            $('#modproductname').val(productname);
+            $('#modproductsize').val(productsize);
+            $('#modstock').val(stock);
+            $('#modsafestock').val(safestock);
+            $('#modpurchaseprice').val(purchaseprice);
+            $('#modsalesprice').val(salesprice);
+            $('#modsupplierid').val(supplierid);
+            $("#modid").val(id)
+            $("#modiproduct").modal()
+        });
+        $('#modproduct').on('click',function () {
+            var productname = $('#modproductname').val();
+            var productsize = $('#modproductsize').val();
+            var stock = $('#modstock').val();
+            var safestock = $('#safestock').val();
+            var purchaseprice = $('#purchaseprice').val();
+            var salesprice = $('#salesprice').val();
+            var supplierid = $('#supplierid').val();
+            if(productname==''){
+                $("#modproductname").focus();
+            }else if(productsize==''){
+                $("#modproductsize").focus();
+            }else if(stock==''){
+                $("#modstock").focus();
+            }else if(safestock=='') {
+                $("#modsafestock").focus();
+            }else if(purchaseprice==''){
+                $("#modpurchaseprice").focus();
+            }else if(salesprice==''){
+                $("#modsalesprice").focus();
+            }else if(supplierid==''){
+                $("#modsupplierid").focus();
+            }else{
+                var data = {};
+                data['id'] = $("#modid").val();
+                data['productname']=productname;
+                data['productsize']=productsize;
+                data['stock']=stock;
+                data['safestock']=safestock;
+                data['purchaseprice']=purchaseprice;
+                data['salesprice']=salesprice;
+                data['supplierid']=supplierid;
+                $.ajax({
+                    url: '/pools/sales_productmodify',
+                    type: 'POST',
+                    data: data,
                     dataType: 'json',
                     timeout: 10000,
                     success: function (result) {
-                        if (result.result == "post_success") {
-    window.location.reload();
-
+                        if (result == "post_success") {
+                            window.location.reload();
                         } else {
                             alert('修改未成功');
                         }
                     }
+                })
+            }
+        })
+        $('.del').on('click',function () {
+            var r=confirm("警告：您确定要删除此产品吗？（此操作不可恢复）");
+            if (r==true) {
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
+                $.ajax({
+                    url: '/pools/sales_productdel',
+                    type: 'POST',
+                    data: {id: id},
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result.result == "post_success") {
+                            document.getElementById(result.id).remove();
+                        } else {
+                            alert('删除未成功');
+                        }
+                    }
                 });
-
+            }
 
         })
 
-     </script>
-
-
-{% endblock %}
+</script>
+{% endblock %}block %}
