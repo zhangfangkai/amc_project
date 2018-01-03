@@ -6,7 +6,7 @@ urlpatterns = [
     url(r'^$',  index),
     url(r'^login', login),
 #用户管理
-    url(r'^admin_usermanage', admin_usermanage),
+    url(r'^admin_employeemanage', admin_employeemanage),
     url(r'^admin_userdelete', admin_userdelete),
     url(r'^admin_modify', admin_modify),
 #销售管理

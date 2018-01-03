@@ -2,9 +2,9 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-           管理员 > 用户管理
+           管理员 > 员工管理
             <span class="smart-widget-option">
-                <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加用户</button>
+                <button data-target="#formInModal" data-toggle="modal" class="btn btn-info btn-sm" style="padding:3px">添加员工</button>
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
@@ -22,7 +22,7 @@
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">添加新用户</h4>
+		        		<h4 class="modal-title" id="myModalLabel">添加新员工</h4>
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
@@ -41,17 +41,17 @@
                             <div class="form-group">
                                 <label class="control-label col-sm-3" for="realname">真实姓名</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="realname" placeholder="请输入真实姓名">
+                                    <input class="form-control" id="realname" placeholder="请输入员工姓名">
                                 </div>
 				  			</div>
                             <div class="form-group">
-				    			<label class="control-label col-sm-3" for="userdepart">用户部门</label>
+				    			<label class="control-label col-sm-3" for="userdepart">部门</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="userdepart" placeholder="请输入用户所在部门">
+                                    <input class="form-control" id="userdepart" placeholder="请输入员工所在部门">
                                 </div>
 				  			</div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">用户角色</label>
+                                <label class="col-sm-3 control-label">角色</label>
                                 <input type="hidden"  name = "role" id="juese" value="1">
                                 <div class="col-sm-8">
                                     <select id="sele" class="form-control">
@@ -75,7 +75,7 @@
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title" id="myModalLabel">修改用户信息</h4>
+		        		<h4 class="modal-title" id="myModalLabel">修改员工信息</h4>
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='useraddform' method="post" role="form" class="form-horizontal">
@@ -95,13 +95,13 @@
                             <div class="form-group">
                                 <label class="control-label col-sm-3" for="realname">真实姓名</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="modrealname" placeholder="请输入真实姓名">
+                                    <input class="form-control" id="modrealname" placeholder="请输入员工姓名">
                                 </div>
 				  			</div>
                             <div class="form-group">
-				    			<label class="control-label col-sm-3" for="userdepart">用户部门</label>
+				    			<label class="control-label col-sm-3" for="userdepart">部门</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="moduserdepart" placeholder="请输入用户所在部门">
+                                    <input class="form-control" id="moduserdepart" placeholder="请输入员工所在部门">
                                 </div>
 				  			</div>
                             <div class="form-group">
@@ -151,7 +151,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in userlist %}
+                    {% for i in employeelist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
                             <td>{{ i.username }}</td>

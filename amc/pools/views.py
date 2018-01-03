@@ -52,25 +52,24 @@ def login(req):
 
 #用户管理
 @csrf_exempt
-def admin_usermanage(req):
+def admin_employeemanage(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        user = User.objects.all()
-        userlist = []
-        for i in user:
+        employee = Employee.objects.all()
+        employeelist = []
+        for i in employee:
             userdetail={}
             userdetail['id']= i.id
-            userdetail['username']= i.userName
-            userdetail['realname']= i.realName
-            userdetail['depart']=i.userDepart
-            userdetail['password'] = i.userPassword
-            userrole = Userrole.objects.get(id=i.userRole_id).roleName
-            userdetail['userrole']=userrole
-            userlist.append(userdetail)
-        data['userlist'] = userlist
+            userdetail['username']= i.user.userName
+            userdetail['realname']= i.employName
+            userdetail['depart']=i.employDepart
+            userdetail['password'] = i.user.userPassword
+            userdetail['userrole']=i.user.userRole.roleName
+            employeelist.append(userdetail)
+        data['employeelist'] = employeelist
         data['username'] = username
-        return render(req, 'admin_usermanage.html', data)
+        return render(req, 'admin_employeemanage.html', data)
     else:
         username = req.POST.get('username')
         password = req.POST.get('password')
