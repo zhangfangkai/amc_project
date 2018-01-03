@@ -64,23 +64,11 @@
                                 </div>
 				  			</div>
                             <div class="form-group">
-                                <label class="control-label col-sm-3" for="email">电子邮件</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="email" placeholder="请输入电子邮件">
-                                </div>
-				  			</div>
-                            <div class="form-group">
                                 <label class="control-label col-sm-3" for="productscope">产品范围</label>
                                 <div class="col-sm-8">
                                     <input class="form-control" id="productscope" placeholder="请输入产品范围">
                                 </div>
 				  			</div>
-{#                            <div class="form-group">#}
-{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
-{#                                <div class="col-sm-8">#}
-{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
-{#                                </div>#}
-{#				  			</div>#}
 		        		</form>
                         <a id='addsupplier'class="btn btn-danger block m-top-md">添加</a>
 		      		</div>
@@ -101,7 +89,7 @@
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="suppliername">供应商单位名称</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" id="modsuppliername" placeholder="请输入供应商单位名称">
+                                    <input class="form-control" id="modsuppliercompany" placeholder="请输入供应商单位名称">
                                 </div>
 				  			</div>
                             <div class="form-group">
@@ -133,20 +121,12 @@
                                     <input class="form-control" id="modproductscope" placeholder="请输入产品范围">
                                 </div>
 				  			</div>
-{#                            <div class="form-group">#}
-{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
-{#                                <div class="col-sm-8">#}
-{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
-{#                                </div>#}
-{#				  			</div>#}
 		        		</form>
                         <a id='modsupplier'class="btn btn-danger block m-top-md">修改</a>
 		      		</div>
 		    	</div>
 		  	</div>
 		</div>
-
-
 
 
         <div class="smart-widget-inner">
@@ -218,7 +198,7 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
-
+        $(".modal").draggable();
         $('#addsupplier').on('click',function(){
             var suppliercompany = $('#suppliercompany').val();
             var linkman = $('#linkman').val();
@@ -239,7 +219,7 @@
             }else if(productscope==''){
                 $("#productscope").focus();
             }else{
-                var data = {}
+                var data = {};
                 data['suppliercompany']=suppliercompany;
                 data['linkman']=linkman;
                 data['address']=address;
@@ -256,7 +236,7 @@
                         if ( result == "post_success" ) {
                             window.location.reload();
                         }else {
-                            alert('未成功');
+                            alert('添加未成功');
                         }
                     }
                 })
@@ -271,7 +251,6 @@
             var phone = tr.children("td").eq(4).text();
             var email = tr.children("td").eq(5).text();
             var productscope = tr.children("td").eq(6).text();
-
             $('#modsuppliercompany').val(suppliercompany);
             $('#modlinkman').val(linkman);
             $('#modaddress').val(address);
@@ -324,9 +303,9 @@
                     }
                 })
             }
-        })
+        });
         $('.del').on('click',function () {
-            var r=confirm("警告：您确定要删除此客户吗？（此操作不可恢复）");
+            var r=confirm("警告：您确定要删除此供应商吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
                 var id = tr.attr("id");
@@ -349,4 +328,4 @@
         })
 
 </script>
-{% endblock %}block %}
+{% endblock %}

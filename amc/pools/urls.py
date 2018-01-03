@@ -27,10 +27,16 @@ urlpatterns = [
     url(r'^kucun_chanpinguanli', kucun_chanpinguanli),
     url(r'^kucun_fahuodanguanli', kucun_fahuodanguanli),
     url(r'^kucun_jinhuodanguanli', kucun_jinhuodanguanli),
-#采购管理
+    url(r'^kucun_productdel', kucun_productdel),
+    url(r'^kucun_productmodify', kucun_productmodify),
+
+    #采购管理
     url(r'^caigou_gongyingshangguanli', caigou_gongyingshangguanli),
     url(r'^caigou_quehuodanguanli', caigou_quehuodanguanli),
     url(r'^caigou_zaidinghuodanguanli', caigou_zaidinghuodanguanli),
+    url(r'^caigou_suppliermodify', caigou_suppliermodify),
+    url(r'^caigou_supplierdel', caigou_supplierdel),
+
     # url(r'^caigou_caigoudingdanguanli', caigou_caigoudingdanguanli),
 #财务管理
     url(r'^caiwu_yingshouzhangguanli', caiwu_yingshouzhangguanli),

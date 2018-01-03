@@ -234,7 +234,7 @@
             var safestock = $('#safestock').val();
             var purchaseprice = $('#purchaseprice').val();
             var salesprice = $('#salesprice').val();
-            var supplierid = $('#suppliered').val();
+            var supplierid = $('#supplierid').val();
             if(productname==''){
                 $("#productname").focus();
             }else if(productsize==''){
@@ -250,7 +250,7 @@
             }else if(supplierid==''){
                 $("#supplierid").focus();
             }else{
-                var data = {}
+                var data = {};
                 data['productname']=productname;
                 data['productsize']=productsize;
                 data['stock']=stock;
@@ -292,17 +292,17 @@
             $('#modpurchaseprice').val(purchaseprice);
             $('#modsalesprice').val(salesprice);
             $('#modsupplierid').val(supplierid);
-            $("#modid").val(id)
-            $("#modiproduct").modal()
+            $("#modid").val(id);
+            $("#modiproduct").modal();
         });
         $('#modproduct').on('click',function () {
             var productname = $('#modproductname').val();
             var productsize = $('#modproductsize').val();
             var stock = $('#modstock').val();
-            var safestock = $('#safestock').val();
-            var purchaseprice = $('#purchaseprice').val();
-            var salesprice = $('#salesprice').val();
-            var supplierid = $('#supplierid').val();
+            var safestock = $('#modsafestock').val();
+            var purchaseprice = $('#modpurchaseprice').val();
+            var salesprice = $('#modsalesprice').val();
+            var supplierid = $('#modsupplierid').val();
             if(productname==''){
                 $("#modproductname").focus();
             }else if(productsize==''){
@@ -318,6 +318,8 @@
             }else if(supplierid==''){
                 $("#modsupplierid").focus();
             }else{
+                            console.log("keyile");
+
                 var data = {};
                 data['id'] = $("#modid").val();
                 data['productname']=productname;
@@ -328,7 +330,7 @@
                 data['salesprice']=salesprice;
                 data['supplierid']=supplierid;
                 $.ajax({
-                    url: '/pools/sales_productmodify',
+                    url: '/pools/kucun_productmodify',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
@@ -342,14 +344,14 @@
                     }
                 })
             }
-        })
+        });
         $('.del').on('click',function () {
             var r=confirm("警告：您确定要删除此产品吗？（此操作不可恢复）");
             if (r==true) {
                 var tr = $(this).parents("tr");
                 var id = tr.attr("id");
                 $.ajax({
-                    url: '/pools/sales_productdel',
+                    url: '/pools/kucun_productdel',
                     type: 'POST',
                     data: {id: id},
                     dataType: 'json',
@@ -367,4 +369,4 @@
         })
 
 </script>
-{% endblock %}block %}
+{% endblock %}

@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render,render_to_response
 from django.template.context import RequestContext
 from models import *
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -276,6 +277,7 @@ def sales_customerdel(req):
 
 
 #库存管理--产品管理
+@csrf_exempt
 def kucun_chanpinguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -291,7 +293,7 @@ def kucun_chanpinguanli(req):
             productdetail['safestock']= i.safastock
             productdetail['purchaseprice'] = i.purchasePrice
             productdetail['salesprice'] = i.saleprice
-            productdetail['supplierid'] = i.supplier
+            productdetail['supplierid'] = i.supplier.id
 
             productlist.append(productdetail)
         data['productlist'] = productlist
@@ -307,13 +309,15 @@ def kucun_chanpinguanli(req):
     else:
         productname = req.POST.get('productname')
         productsize = req.POST.get('productsize')
-        stock = req.POST.get('stock')
-        safestock = req.POST.get('safestock')
+        stock = int(req.POST.get('stock'))
+        safestock = int(req.POST.get('safestock'))
         purchaseprice = req.POST.get('purchaseprice')
         salesprice = req.POST.get('salesprice')
         supplierid = req.POST.get('supplierid')
-        Product.objects.create(productName=productname, productSize=productsize, stock=stock, safestock=safestock,
-                               purchasePrice=purchaseprice, saleprice=salesprice, supplier=supplierid)
+        supplier = Supplier.objects.get(id=supplierid)
+
+        Product.objects.create(productName=productname, productSize=productsize, stock=stock, safastock=safestock,
+                               purchasePrice=purchaseprice, saleprice=salesprice, supplier=supplier, status = 1)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -322,17 +326,17 @@ def kucun_chanpinguanli(req):
 @csrf_exempt
 def kucun_productmodify(req):
     if req.method == 'POST':
-        print "keyixiugai"
         productname = req.POST.get('productname')
         productsize = req.POST.get('productsize')
-        stock = req.POST.get('stock')
-        safestock = req.POST.get('safestock')
+        stock = int(req.POST.get('stock'))
+        safestock = int(req.POST.get('safestock'))
         purchaseprice = req.POST.get('purchaseprice')
         salesprice = req.POST.get('salesprice')
         supplierid = req.POST.get('supplierid')
+        supplier = Supplier.objects.get(id=supplierid)
         id = req.POST.get('id')
-        Product.objects.filter(id=id).update(productName=productname, productSize=productsize, stock=stock, safestock=safestock,
-                               purchasePrice=purchaseprice, saleprice=salesprice, supplier=supplierid)
+        Product.objects.filter(id=id).update(productName=productname, productSize=productsize, stock=stock, safastock=safestock,
+                               purchasePrice=purchaseprice, saleprice=salesprice, supplier=supplier)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -343,7 +347,7 @@ def kucun_productdel(req):
     if req.method == 'POST':
         print "keyi shanchu"
         id = req.POST.get('id')
-        Product.objects.filter(id=id).delete()
+        Product.objects.filter(id=id)[0].delete()
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
@@ -512,6 +516,7 @@ def caigou_zaidinghuodanguanli(req):
 #        return render(req, 'admin_caigoudingdanguanli.html', data)
 
 #采购管理-供应商管理
+@csrf_exempt
 def caigou_gongyingshangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
@@ -552,7 +557,6 @@ def caigou_gongyingshangguanli(req):
 @csrf_exempt
 def caigou_suppliermodify(req):
     if req.method == 'POST':
-        print "keyixiugai"
         suppliercompany = req.POST.get('suppliercompany')
         linkman = req.POST.get('linkman')
         address = req.POST.get('address')
@@ -569,7 +573,6 @@ def caigou_suppliermodify(req):
 @csrf_exempt
 def caigou_supplierdel(req):
     if req.method == 'POST':
-        print "keyi shanchu"
         id = req.POST.get('id')
         Supplier.objects.filter(id=id).delete()
         data = {}
@@ -686,8 +689,3 @@ def lockscreen(req):
     username = req.session['username']
     data['username']=username
     return render(req, 'lockscreen.html', data)
-
-
-
-
-

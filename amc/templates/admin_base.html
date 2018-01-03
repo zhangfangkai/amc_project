@@ -8,6 +8,8 @@
 	    <meta name="author" content="">
         <!-- Jquery -->
 		<script src="/static/js/jquery-1.11.1.min.js"></script>
+        <script src="/static/js/jquery-ui.min.js"></script>
+        <link href="/static/css/jquery-ui.min.css" rel="stylesheet">
 	    <!-- Bootstrap core CSS -->
 	    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<link rel="shortcut icon" href="/static/images/favicon.ico">
@@ -16,7 +18,7 @@
 
 		<!-- ionicons -->
 		<link href="/static/css/ionicons.min.css" rel="stylesheet">
-		
+
 		<!-- Morris -->
 		<link href="/static/css/morris.css" rel="stylesheet"/>
 
@@ -32,7 +34,7 @@
 
 		<!-- Simplify -->
 		<link href="/static/css/simplify.min.css" rel="stylesheet">
-	
+
   	</head>
 
   	<body class="overflow-hidden">
@@ -97,16 +99,20 @@
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-						<ul class="nav-notification">
+						<ul class="nav-notification display:inline" >
 							<li class="search-list">
 								<div class="search-input-wrapper">
-									<div class="search-input">
-										<input type="text" class="form-control input-sm inline-block">
-										<a href="#" class="input-icon text-normal"><i class="ion-ios7-search-strong"></i></a>
-									</div>
+{#									<div class="search-input">#}
+{#										<input type="text" class="form-control input-sm inline-block">#}
+{#										<a href="#" class="input-icon text-normal"><i class="ion-ios7-search-strong"></i></a>#}
+{#									</div>#}
+                                    <div id="newdata" style="font-size: medium" ></div>
+
 								</div>
 							</li>
+
 						</ul>
+
 						<div class="pull-right m-right-sm">
 							<div class="user-block hidden-xs">
 								<a href="#" id="userToggle" data-toggle="dropdown">
@@ -145,7 +151,8 @@
 							</ul>
 						</div>
 					</div>
-				</div><!-- ./top-nav-inner -->
+                    </div>
+				<!-- ./top-nav-inner -->
 			</header>
 			<aside class="sidebar-menu fixed">
 				<div class="sidebar-inner scrollable-sidebar">
@@ -260,7 +267,6 @@
 	    ================================================== -->
 	    <!-- Placed at the end of the document so the pages load faster -->
 
-
 		<!-- Bootstrap -->
 	    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 
@@ -301,7 +307,33 @@
 		<!-- Simplify -->
 		<script src="/static/js/simplify/simplify.js"></script>
 		<script src="/static/js/simplify/simplify_dashboard.js"></script>
+        <script type="text/javascript">
 
+            window.onload=function(){
+                //定时器每秒调用一次fnDate()
+                setInterval(function(){
+                fnDate();
+                },1000);
+            };
 
+            //js 获取当前时间
+            function fnDate(){
+                var oDiv=document.getElementById("newdata");
+                var date=new Date();
+                var year=date.getFullYear();//当前年份
+                var month=date.getMonth();//当前月份
+                var data=date.getDate();//天
+                var hours=date.getHours();//小时
+                var minute=date.getMinutes();//分
+                var second=date.getSeconds();//秒
+                var time=year+"-"+fnW((month+1))+"-"+fnW(data)+"  "+fnW(hours)+":"+fnW(minute)+":"+fnW(second);
+                oDiv.innerHTML=time;
+            }
+            function fnW(str){
+                var num;
+                str>=10?num=str:num="0"+str;
+                return num;
+            }
+        </script>
   	</body>
 </html>
