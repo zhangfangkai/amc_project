@@ -3,7 +3,9 @@ from django.conf.urls import url
 from views import *
 
 urlpatterns = [
-    url(r'^$',  index),
+    url(r'^$', index_n),
+    url(r'^index_n', index_n),
+    url(r'^index', index),
     url(r'^login', login),
 #用户管理
     url(r'^admin_employeemanage', admin_employeemanage),

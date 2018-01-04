@@ -16,9 +16,13 @@ from django.utils import timezone
 # Create your views here.
 
 #mkx-index
+def index_n(req):
+    if req.method == 'GET':
+        return render(req, 'index_newyear.html', {})
+
 def index(req):
     if req.method == 'GET':
-        return render(req, 'amc_index.html', {})
+        return render(req, 'index.html', {})
 
 @csrf_exempt
 def login(req):
