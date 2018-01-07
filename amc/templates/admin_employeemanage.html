@@ -182,11 +182,11 @@
         $('#sele').change(function(){
             var key = this.value;
             $('#juese').val(key);
-        })
+        });
         $('#sele2').change(function(){
             var key = this.value;
             $('#modjuese').val(key);
-        })
+        });
         $('#adduser').on('click',function () {
             var username = $('#username').val();
             var password = $('#password').val();
@@ -209,7 +209,7 @@
                 data['userdepart']=userdepart;
                 data['juese']=juese;
                 $.ajax({
-                    url: '/pools/admin_usermanage',
+                    url: '/pools/admin_employeemanage',
                     type: 'POST',
                     data: data,
                     dataType: 'json',
@@ -223,12 +223,12 @@
                     }
                 });
             }
-        })
+        });
         $('.del').on('click',function () {
             var r=confirm("警告：您确定要删除此用户吗？（此操作不可恢复）");
             if (r==true) {
-                var tr = $(this).parents("tr")
-                var id = tr.attr("id")
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
                 $.ajax({
                     url: '/pools/admin_userdelete',
                     type: 'POST',
@@ -245,7 +245,7 @@
                 });
             }
 
-        })
+        });
         $('.modi').on('click',function (){
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
@@ -258,9 +258,9 @@
             $('#modrealname').val(realname);
             $('#moduserdepart').val(depart);
             $('#modpassword').val(password);
-            $("#modid").val(id)
+            $("#modid").val(id);
             $("#modefyuser").modal()
-        })
+        });
         $('#moduser').on('click',function () {
             var username = $('#modname').val();
             var password = $('#modpassword').val();

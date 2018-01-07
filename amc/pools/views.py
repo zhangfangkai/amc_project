@@ -64,7 +64,7 @@ def admin_employeemanage(req):
         employeelist = []
         for i in employee:
             userdetail={}
-            userdetail['id']= i.id
+            userdetail['id']= i.user.id
             userdetail['username']= i.user.userName
             userdetail['realname']= i.employName
             userdetail['depart']=i.employDepart
@@ -80,7 +80,8 @@ def admin_employeemanage(req):
         realname = req.POST.get('realname')
         userdepart = req.POST.get('userdepart')
         juese = req.POST.get('juese')
-        User.objects.create(userName=username,userPassword=password,realName=realname,userDepart=userdepart,userRole_id=juese)
+        user=User.objects.create(userName=username,userPassword=password,userRole_id=juese)
+        Employee.objects.create(employName = realname,employDepart = userdepart,user = user)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -89,9 +90,11 @@ def admin_userdelete(req):
     if req.method == 'POST':
         print "keyi shanchu"
         user_id = req.POST.get('userid')
-        User.objects.filter(id=user_id).delete()
+        user = User.objects.filter(id=user_id)
+        Employee.objects.filter(user = user ).delete()
+        user.delete()
         data = {}
-        data['result'] = 'post_success';
+        data['result'] = 'post_success'
         data['id'] = user_id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -105,8 +108,9 @@ def admin_modify(req):
         userdepart = req.POST.get('userdepart')
         juese = req.POST.get('juese')
         user_id = req.POST.get('userid')
-        User.objects.filter(id=user_id).update(userName=username, userPassword=password, realName=realname,
-                                               userDepart=userdepart, userRole_id=juese)
+        User.objects.filter(id=user_id).update(userName=username, userPassword=password,
+                                               userRole_id=juese)
+        Employee.objects.filter(user_id = user_id).update(employName = realname,employDepart = userdepart)
 
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
@@ -124,7 +128,7 @@ def sales_ordermanage(req):
         for i in sales:
             salesdetail={}
             salesdetail['id']= i.id
-            salesdetail['user']= i.user.realName
+            salesdetail['user']= i.user.userName
             salesdetail['customername'] = i.customer.customerName
             salesdetail['receaddress'] = i.receAddress
             salesdetail['ordertime']= i.orderTime
@@ -226,6 +230,8 @@ def sales_customermanage(req):
         customerlist = []
         for i in clist:
             customerdetail={}
+            customerdetail['username']=i.user.userName
+            customerdetail['password']=i.user.userPassword
             customerdetail['id']= i.id
             customerdetail['customername'] = i.customerName
             customerdetail['customeraddress'] = i.address
