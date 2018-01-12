@@ -33,6 +33,18 @@
 		      		</div>
 		      		<div class="modal-body">
 		        		<form  id='customeraddform' method="post" role="form" class="form-horizontal">
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="customerusername">客户系统用户名</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="customerusername" placeholder="客户系统用户名">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="customerpassword">客户系统密码</label>
+                                <div class="col-sm-8">
+                                    <input type="password"  class="form-control" id="customerpassword" placeholder="客户系统密码">
+                                </div>
+				  			</div>
 				  			<div class="form-group">
 				    			<label class="control-label col-sm-3" for="customername">客户姓名</label>
                                 <div class="col-sm-8">
@@ -57,12 +69,6 @@
                                     <input class="form-control" id="email" placeholder="请输入邮箱">
                                 </div>
 				  			</div>
-{#                            <div class="form-group">#}
-{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
-{#                                <div class="col-sm-8">#}
-{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
-{#                                </div>#}
-{#				  			</div>#}
 		        		</form>
                         <a id='addcustomer'class="btn btn-danger block m-top-md">添加</a>
 		      		</div>
@@ -183,11 +189,17 @@
     <script type="text/javascript">
 
         $('#addcustomer').on('click',function(){
+            var customerusername = $('#customerusername').val();
+            var customerpassword = $('#customerpassword').val();
             var customername = $('#customername').val();
             var customeraddress = $('#customeraddress').val();
             var phone = $('#phone').val();
             var email = $('#email').val();
-            if(customername==''){
+            if(customerusername==''){
+                $("#customerusername").focus();
+            }else if(customerpassword==''){
+                $("#customerpassword").focus();
+            }else if(customername==''){
                 $("#customername").focus();
             }else if(customeraddress==''){
                 $("#customeraddress").focus();
@@ -196,7 +208,9 @@
             }else if(email==''){
                 $("#email").focus();
             }else{
-                var data = {}
+                var data = {};
+                data['customerusername'] = customerusername;
+                data['customerpassword'] = customerpassword;
                 data['customername']=customername;
                 data['customeraddress']=customeraddress;
                 data['phone']=phone;

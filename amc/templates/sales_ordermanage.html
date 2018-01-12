@@ -50,7 +50,7 @@
                             <h4 class="modal-title" id="myModalLabel">添加订单</h4>
                         </div>
                         <div class="modal-body">
-                            <form  id='orderaddform' action="/pools/sales_addorder/" method="post" class="form-horizontal">
+                            <form  id='orderaddform' class="form-horizontal">
                             <input type="hidden" name = "username"  value = {{ username }}>
                             <input type="hidden" name = "rows"  value = 1>
                                 <div class="form-group">
@@ -133,13 +133,63 @@
                                     <tr>
                                         <th>编号</th>
                                         <th>产品名称</th>
-                                        <th>产品</th>
+                                        <th>产品数量</th>
                                     </tr>
                                 </thead>
                                 <tbody id = "orderdetailbody">
 
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- shenhetongguo -->
+            <div class="modal fade" id="shenhetongguo">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">库存审核结果</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input id="shenhesuccess" type="hidden">
+                            <div class="font-18 font-semi-bold">
+                                库存充足
+                            </div>
+                            <iframe id="id_iframe" name="id_iframe" style="display: none;">
+                            </iframe>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="successfahuo" type="button" class="btn btn-success">发货</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- shenheshibai-->
+            <div class="modal fade" id="shenheshibai">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">库存审核结果</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input id="shenheunsuccess" type="hidden">
+                            <div class="font-18 font-semi-bold">
+                                部分商品缺货
+                            </div>
+                            <iframe id="id_iframe" name="id_iframe" style="display: none;">
+                            </iframe>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="unsuccessfahuo" type="button" class="btn btn-success">开缺货单并发部分货</button>
                         </div>
                     </div>
                 </div>
@@ -168,9 +218,10 @@
                             <td>{{ i.ordertime|date:"Y-m-d" }}</td>
                             <td>{{ i.status }}</td>
                             <td>
-                                <button class="btn btn-info btn-xs zhifu">已支付</button>
-                                <button class="btn btn-info btn-xs chuli">已处理</button>
-                                <button class="btn btn-info btn-xs wancheng">已完成</button>
+                                <button class="btn btn-info btn-xs shenhe">审核通过</button>
+                                <button class="btn btn-info btn-xs dahui">打回</button>
+                                <button class="btn btn-info btn-xs kucuncheck">库存检验</button>
+
                             </td>
                             <td>
                                 <button class="btn btn-info btn-xs xiangqing">详情</button>
@@ -197,63 +248,68 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
-        $('.zhifu').on('click',function () {
+        $('.shenhe').on('click',function () {
             var sta = $(this).parent().prev().get(0);
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
             $.ajax({
                 url: '/pools/sales_ordermanage',
                 type: 'POST',
-                data: {'orderid': id,'status':"已支付"},
+                data: {'orderid': id,'status':"已审核"},
                 dataType: 'json',
                 timeout: 10000,
                 success: function (result) {
                     if (result == "post_success") {
-                        sta.innerHTML = "已支付";
+                        sta.innerHTML = "已审核";
                     } else {
                         alert('操作未成功');
                     }
                 }
             });
         });
-        $('.chuli').on('click',function () {
+        $('.dahui').on('click',function () {
             var sta = $(this).parent().prev().get(0);
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
             $.ajax({
                 url: '/pools/sales_ordermanage',
                 type: 'POST',
-                data: {'orderid': id,'status':"已处理"},
+                data: {'orderid': id,'status':"已打回"},
                 dataType: 'json',
                 timeout: 10000,
                 success: function (result) {
                     if (result == "post_success") {
-                        sta.innerHTML = "已处理";
+                        sta.innerHTML = "已打回";
                     } else {
                         alert('操作未成功');
                     }
                 }
             });
         });
-        $('.wancheng').on('click',function () {
+         $('.kucuncheck').on('click',function () {
             var sta = $(this).parent().prev().get(0);
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
             $.ajax({
                 url: '/pools/sales_ordermanage',
                 type: 'POST',
-                data: {'orderid': id,'status':"已完成"},
+                data: {'orderid': id,'status':"发货"},
                 dataType: 'json',
                 timeout: 10000,
-                success: function (result) {
-                    if (result == "post_success") {
-                        sta.innerHTML = "已完成";
-                    } else {
+                success: function (data) {
+                    if (data.result == 1) {
+                        $("#shenhesuccess").val(data.id);
+                        $("#shenhetongguo").modal()
+                    } else if(data.result ==2){
+                        $("#shenheunsuccess").val(data.id);
+                        $("#shenheshibai").modal()
+                    }else{
                         alert('操作未成功');
                     }
                 }
             });
         });
+
     $('#productbody').delegate('.fa-plus-circle','click',function(){
         var rows = $("#product").find('tr').length-1;
         $('#productbody').append(
@@ -298,7 +354,7 @@
         data['customername'] = $('#customername option:selected').val();
         data['shouhuoname'] =$('#shouhuoname').val();
         data['customeraddress'] = $('#customeraddress').val();
-        var i = 0
+        var i = 0;
         $('#product').find('tr').each(function(){
             var proname = 'productname'+ i;
             var pronum = 'productnum'+i;
@@ -364,6 +420,45 @@
                     $("#orderdetail").modal()
 
 
+                } else {
+                    alert('操作未成功');
+                }
+            }
+        })
+
+    });
+    $('#successfahuo').on('click',function () {
+        var id = $('#shenhesuccess').val();
+        var sta = $(this).parent().prev().get(0);
+
+        $.ajax({
+            url: '/pools/sales_successfahuo',
+            type: 'POST',
+            data: {id: id},
+            dataType: 'json',
+            timeout: 10000,
+            success: function (data) {
+                if (data.result == "post_success") {
+                    sta.innerHTML = "已发货"
+                } else {
+                    alert('操作未成功');
+                }
+            }
+        })
+
+    });
+    $('#unsuccessfahuo').on('click',function () {
+        var id = $('#shenheunsuccess').val();
+        $.ajax({
+            url: '/pools/sales_unsuccessfahuo',
+            type: 'POST',
+            data: {id: id},
+            dataType: 'json',
+            timeout: 10000,
+            success: function (data) {
+                if (data.result == "post_success") {
+                    $("#shenheshibai").modal('hide');
+                    sta.innerHTML = "部分发货";
                 } else {
                     alert('操作未成功');
                 }

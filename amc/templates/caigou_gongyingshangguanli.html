@@ -34,6 +34,18 @@
 		      		<div class="modal-body">
 		        		<form  id='supplieraddform' method="post" role="form" class="form-horizontal">
 				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="username">供应商系统用户名</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="username" placeholder="请输入供应商系统用户名">
+                                </div>
+				  			</div>
+                            <div class="form-group">
+				    			<label class="control-label col-sm-3" for="password">供应商系统密码</label>
+                                <div class="col-sm-8">
+                                    <input type="password" class="form-control" id="password" placeholder="请输入供应商系统密码">
+                                </div>
+				  			</div>
+                            <div class="form-group">
 				    			<label class="control-label col-sm-3" for="suppliercompany">供应商单位名称</label>
                                 <div class="col-sm-8">
                                     <input class="form-control" id="suppliercompany" placeholder="请输入供应商单位名称">
@@ -148,33 +160,28 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>供应商编号</th>
-                        <th>供应商单位名称</th>
+                        <th>编号</th>
+                        <th>用户名<th>
+                        <th>单位名称</th>
                         <th>联系人</th>
-                        <th>联系地址</th>
                         <th>联系电话</th>
-                        <th>电子邮件</th>
                         <th>产品范围</th>
                         <th>操作</th>
-
                     </tr>
                     </thead>
                     <tbody>
                     {% for i in supplierlist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
+                            <td>{{ i.username }}</td>
                             <td>{{ i.suppliercompany }}</td>
                             <td>{{ i.linkman }}</td>
-                            <td>{{ i.address }}</td>
                             <td>{{ i.phone }}</td>
-                            <td>{{ i.email }}</td>
                             <td>{{ i.productscope }}</td>
-{#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
-{#                            <td>发布/未发布</td>#}
                             <td>
+                                <button class="btn btn-info btn-xs xiangqing">详情</button>
                                 <button class="btn btn-info btn-xs xiugai">修改</button>
                                 <button class="btn btn-info btn-xs del">删除</button>
-
                             </td>
                         </tr>
                     {% endfor %}
@@ -200,13 +207,19 @@
     <script type="text/javascript">
         $(".modal").draggable();
         $('#addsupplier').on('click',function(){
+            var username = $('#username').val();
+            var password = $('#password').val();
             var suppliercompany = $('#suppliercompany').val();
             var linkman = $('#linkman').val();
             var address = $('#address').val();
             var phone = $('#phone').val();
             var email = $('#email').val();
             var productscope = $('#productscope').val();
-            if(suppliercompany==''){
+            if(username == ''){
+                $('#username').focus();
+            }else if(password == ""){
+                $('#password').focus();
+            }else if(suppliercompany==''){
                 $("#suppliercompany").focus();
             }else if(linkman==''){
                 $("#linkman").focus();
@@ -220,6 +233,8 @@
                 $("#productscope").focus();
             }else{
                 var data = {};
+                data['username'] = username;
+                data['password'] = password;
                 data['suppliercompany']=suppliercompany;
                 data['linkman']=linkman;
                 data['address']=address;

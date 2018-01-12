@@ -16,6 +16,11 @@ urlpatterns = [
     url(r'^sales_ordermanage', sales_ordermanage),
     url(r'^sales_customerdel',sales_customerdel),
     url(r'^sales_customermodify', sales_customermodify),
+    url(r'^sales_successfahuo', sales_successfahuo),
+    url(r'^sales_unsuccessfahuo', sales_unsuccessfahuo),
+
+
+
 
     url(r'^sales_addorder', sales_addorder),
     url(r'^sales_delorder', sales_delorder),

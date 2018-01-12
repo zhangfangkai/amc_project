@@ -89,6 +89,7 @@ class Againpurchase(models.Model):
     supplier = models.ForeignKey(Supplier,on_delete=models.CASCADE)
     addTime = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20)
+
 #再订货单明细
 class AgainpurchaseDetail(models.Model):
     againpurchase = models.ForeignKey(Againpurchase, on_delete=models.CASCADE)

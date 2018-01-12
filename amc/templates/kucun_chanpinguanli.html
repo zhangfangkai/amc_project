@@ -58,29 +58,12 @@
                                 </div>
 				  			</div>
                             <div class="form-group">
-                                <label class="control-label col-sm-3" for="purchaseprice">购买价格</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="purchaseprice" placeholder="请输入购买价格">
-                                </div>
-				  			</div>
-                            <div class="form-group">
                                 <label class="control-label col-sm-3" for="salesprice">销售价格</label>
                                 <div class="col-sm-8">
                                     <input class="form-control" id="salesprice" placeholder="请输入销售价格">
                                 </div>
 				  			</div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-3" for="supplierid">供应商编号</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="supplierid" placeholder="请输入供应商编号">
-                                </div>
-				  			</div>
-{#                            <div class="form-group">#}
-{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
-{#                                <div class="col-sm-8">#}
-{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
-{#                                </div>#}
-{#				  			</div>#}
+
 		        		</form>
                         <a id='addproduct'class="btn btn-danger block m-top-md">添加</a>
 		      		</div>
@@ -122,30 +105,14 @@
                                     <input class="form-control" id="modsafestock" placeholder="请输入安全库存">
                                 </div>
 				  			</div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-3" for="purchaseprice">购买价格</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="modpurchaseprice" placeholder="请输入购买价格">
-                                </div>
-				  			</div>
+
                             <div class="form-group">
                                 <label class="control-label col-sm-3" for="salesprice">销售价格</label>
                                 <div class="col-sm-8">
                                     <input class="form-control" id="modsalesprice" placeholder="请输入销售价格">
                                 </div>
 				  			</div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-3" for="supplierid">供应商编号</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" id="modsupplierid" placeholder="请输入供应商编号">
-                                </div>
-				  			</div>
-{#                            <div class="form-group">#}
-{#                                <label class="control-label col-sm-3" for="credit">客户信用水平</label>#}
-{#                                <div class="col-sm-8">#}
-{#                                    <input class="form-control" id="credit" placeholder="请输入客户信用水平">#}
-{#                                </div>#}
-{#				  			</div>#}
+
 		        		</form>
                         <a id='modproduct'class="btn btn-danger block m-top-md">修改</a>
 		      		</div>
@@ -178,14 +145,11 @@
                         <th>产品规格</th>
                         <th>现有库存</th>
                         <th>安全库存</th>
-                        <th>购买价格</th>
                         <th>销售价格</th>
-                        <th>供应商编号</th>
                         <th>操作</th>
-
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="productformbody">
                     {% for i in productlist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
@@ -193,12 +157,7 @@
                             <td>{{ i.productsize }}</td>
                             <td>{{ i.stock }}</td>
                             <td>{{ i.safestock }}</td>
-                            <td>{{ i.purchaseprice }}</td>
                             <td>{{ i.salesprice }}</td>
-                            <td>{{ i.supplierid }}</td>
-
-{#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
-{#                            <td>发布/未发布</td>#}
                             <td>
                             <button class="btn btn-info btn-xs xiugai">修改</button>
                             <button class="btn btn-info btn-xs del">删除</button>
@@ -226,15 +185,27 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
      <script type="text/javascript">
+         $(document).ready(function(){
+             $('#productformbody').find('tr').each(function () {
+                 stock = $(this).children('td').eq(3).html();
+                 safestock = $(this).children('td').eq(4).html();
+                 console.log(stock,safestock);
+                 if(parseInt(stock) < parseInt(safestock)){
+                     console.log($(this));
+                     $(this).css('background-color','#CCFF99');
+                 }
+
+             });
+         });
+
+
 
          $('#addproduct').on('click',function(){
             var productname = $('#productname').val();
             var productsize = $('#productsize').val();
             var stock = $('#stock').val();
             var safestock = $('#safestock').val();
-            var purchaseprice = $('#purchaseprice').val();
             var salesprice = $('#salesprice').val();
-            var supplierid = $('#supplierid').val();
             if(productname==''){
                 $("#productname").focus();
             }else if(productsize==''){
@@ -243,21 +214,15 @@
                 $("#stock").focus();
             }else if(safestock=='') {
                 $("#safestock").focus();
-            }else if(purchaseprice=='') {
-                $("#purchaseprice").focus();
             }else if(salesprice=='') {
                 $("#salesprice").focus();
-            }else if(supplierid==''){
-                $("#supplierid").focus();
             }else{
                 var data = {};
                 data['productname']=productname;
                 data['productsize']=productsize;
                 data['stock']=stock;
                 data['safestock']=safestock;
-                data['purchaseprice']=purchaseprice;
                 data['salesprice']=salesprice;
-                data['supplierid']=supplierid;
                 $.ajax({
                     url: '/pools/kucun_chanpinguanli',
                     type: 'POST',
@@ -281,17 +246,13 @@
             var productsize = tr.children("td").eq(2).text();
             var stock = tr.children("td").eq(3).text();
             var safestock = tr.children("td").eq(4).text();
-            var purchaseprice = tr.children("td").eq(5).text();
             var salesprice = tr.children("td").eq(6).text();
-            var supplierid = tr.children("td").eq(7).text();
 
             $('#modproductname').val(productname);
             $('#modproductsize').val(productsize);
             $('#modstock').val(stock);
             $('#modsafestock').val(safestock);
-            $('#modpurchaseprice').val(purchaseprice);
             $('#modsalesprice').val(salesprice);
-            $('#modsupplierid').val(supplierid);
             $("#modid").val(id);
             $("#modiproduct").modal();
         });
@@ -300,9 +261,7 @@
             var productsize = $('#modproductsize').val();
             var stock = $('#modstock').val();
             var safestock = $('#modsafestock').val();
-            var purchaseprice = $('#modpurchaseprice').val();
             var salesprice = $('#modsalesprice').val();
-            var supplierid = $('#modsupplierid').val();
             if(productname==''){
                 $("#modproductname").focus();
             }else if(productsize==''){

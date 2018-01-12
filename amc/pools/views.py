@@ -156,23 +156,89 @@ def sales_ordermanage(req):
     else:
         orderid=req.POST.get('orderid')
         status = req.POST.get('status')
-        Order.objects.filter(id=orderid).update(status=status)
-        result = 'post_success'
-        return HttpResponse(json.dumps(result), content_type='application/json')
+        if status == "已审核" or status == "已打回":
+            Order.objects.filter(id=orderid).update(status=status)
+            result = "post_success"
+            return HttpResponse(json.dumps(result), content_type='application/json')
+        elif status == "发货":
+            order = Order.objects.filter(id=orderid)
+            orderdetail = Order_detail.objects.filter(order=order)
+            tag = 1
+            for i in orderdetail:
+                kucun = i.product.stock
+                shuliang = i.orderNum
+                if (kucun-shuliang)<0:
+                    tag = 0
+                    break
+            if tag == 1:
+                result = 1
+            else:
+                result = 2
+            data={}
+            data['result']=result
+            data['id']=orderid
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+# 销售管理-成功发货
+@csrf_exempt
+def sales_successfahuo(req):
+    if req.method == "POST":
+        order_id = req.POST.get('id')
+        userid = req.session['user_id']
+        order = Order.objects.get(id=order_id)
+        user = User.objects.get(id = userid)
+        order.update(status = "已发货",)
+        deliver=Deliver.objects.create(order = order,user = user,addTime = timezone.now(),status = "已发货")
+        orderdetail = order.order_detail_set.all()
+        for i in orderdetail:
+            stock = i.product.stock-i.orderNum
+            i.product.update(stock = stock)
+            DeliverDatail.objects.create(deliver = deliver,product = i.product,deliverNum = i.orderNum)
+        data = {}
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+# 销售管理-部分发货开缺货单单
+@csrf_exempt
+def sales_unsuccessfahuo(req):
+    if req.method == "POST":
+        order_id = req.POST.get('id')
+        userid = req.session['user_id']
+        order = Order.objects.get(id=order_id)
+        user = User.objects.get(id=userid)
+        Order.objects.filter(id = order_id).update(status="部分发货")
+        deliver = Deliver.objects.create(order=order, user=user, addTime=timezone.now(), status="部分发货")
+        outdemand = OutDemand.objects.create(order = order,user = user,addTime = timezone.now(),status ="缺货")
+        orderdetail = order.order_detail_set.all()
+        for i in orderdetail:
+            stock = i.product.stock - i.orderNum
+            if stock>=0:
+                Product.objects.filter(id=i.product.id).update(stock=stock)
+                DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.orderNum)
+            else:
+                DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.product.stock)
+                Product.objects.filter(id=i.product.id).update(stock=0)
+                OutdemandDetail.objects.create(outDemand = outdemand,product = i.product,outNum = (0-stock))
+        data = {}
+        data['result'] = 'post_success'
+        print "nihao"
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 # 销售管理-增加订单
 @csrf_exempt
 def sales_addorder(req):
     if req.method == "POST":
         rows = req.POST.get('rows')
-        username = req.session['username']
-        user = User.objects.get(userName=username)
+        user_id = req.session['user_id']
+        user = User.objects.get(id=user_id)
         customername = req.POST.get('customername')
         customeraddress = req.POST.get('customeraddress')
         shouhuoname = req.POST.get('shouhuoname')
         customer = Customer.objects.get(customerName=customername)
         order = customer.order_set.create(receAddress=customeraddress, receiver=shouhuoname,
-                                          orderTime=timezone.now(), status="已提交", user=user, outDemandTimes=0)
+                                          orderTime=timezone.now(), status="待审核", user=user,sumprice = 0)
+        sumprice = 0
         for i in range(0, int(rows)):
             tempproname = 'productname' + str(i)
             temppronum = 'productnum' + str(i)
@@ -180,8 +246,12 @@ def sales_addorder(req):
             productnum = req.POST.get(temppronum)
             product = Product.objects.filter(productName=productname)[0]
             print i, productname, productnum
+            print type(product.saleprice)
+            price = product.saleprice * int(productnum)
+            sumprice = sumprice + price
             order.order_detail_set.create(product=product, orderNum=productnum)
             print "keyi"
+        Order.objects.filter(id = order.id).update(sumprice = sumprice)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -249,11 +319,15 @@ def sales_customermanage(req):
         data['base_template'] = base_template
         return render(req, 'sales_customermanage.html', data)
     else:
+        print "111"
+        customerusername = req.POST.get('customerusername')
+        customerpassword = req.POST.get('customerpassword')
+        user = User.objects.create(userName = customerusername, userPassword = customerpassword,userRole_id = 6)
         customername = req.POST.get('customername')
         customeraddress = req.POST.get('customeraddress')
         phone = req.POST.get('phone')
         email = req.POST.get('email')
-        Customer.objects.create(customerName=customername,address=customeraddress,phone=phone,email=email,credit=100)
+        Customer.objects.create(customerName=customername,address=customeraddress,phone=phone,email=email,credit=100,user = user)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -278,7 +352,9 @@ def sales_customerdel(req):
     if req.method == 'POST':
         print "keyi shanchu"
         id = req.POST.get('id')
+        user = Customer.objects.filter(id=id).user
         Customer.objects.filter(id=id).delete()
+        user.delete()
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
@@ -300,13 +376,10 @@ def kucun_chanpinguanli(req):
             productdetail['productsize'] = i.productSize
             productdetail['stock'] = i.stock
             productdetail['safestock']= i.safastock
-            productdetail['purchaseprice'] = i.purchasePrice
             productdetail['salesprice'] = i.saleprice
-            productdetail['supplierid'] = i.supplier.id
-
             productlist.append(productdetail)
         data['productlist'] = productlist
-        data['realname'] = username
+        data['username'] = username
         user = User.objects.get(userName=username)
         if user.userRole_id == 1:
             base_template = 'admin_base.html'
@@ -502,28 +575,6 @@ def caigou_zaidinghuodanguanli(req):
         data['base_template'] = base_template
         return render(req, 'caigou_zaidinghuodanguanli.html', data)
 
-# #mkx-采购订单
-# def admin_caigoudingdanguanli(req):
-#    if req.method == 'GET':
-#        username = req.session['username']
-#        data={}
-#        caigoudingdan = AgainpurchaseDetail.objects.all()
-#        caigoudingdanlist = []
-#       for i in caigoudingdan:
-#            caigoudingdandetail={}
-#            caigoudingdandetail['id']= i.id
-#            caigoudingdandetail['pid']= Product.objects.get(id=i.product_id).id
-#            caigoudingdandetail['pname'] = Product.objects.get(id=i.product_id).productName
-#            caigoudingdandetail['pnum'] = i.purchaseNum
-#            caigoudingdandetail['apid'] = i.againpurchase_id #通知单编号
-#            caigoudingdandetail['time'] = Againpurchase.objects.get(id=i.againpurchase_id).addTime
-#            caigoudingdandetail['user'] = Againpurchase.objects.get(id=i.againpurchase_id).user
-#            caigoudingdandetail['state'] = Againpurchase.objects.get(id=i.againpurchase_id).status
-#            caigoudingdanlist.append(caigoudingdandetail)
-#        data['caigoudingdanlist'] = caigoudingdanlist
-#        data['realname'] = username
-#        return render(req, 'admin_caigoudingdanguanli.html', data)
-
 #采购管理-供应商管理
 @csrf_exempt
 def caigou_gongyingshangguanli(req):
@@ -535,15 +586,14 @@ def caigou_gongyingshangguanli(req):
         for i in supplier:
             supplierdetail={}
             supplierdetail['id']= i.id
+            supplierdetail['username'] = i.user.userName
             supplierdetail['suppliercompany']= i.supplierName
             supplierdetail['linkman'] = i.linkMan
-            supplierdetail['address'] = i.address
             supplierdetail['phone']= i.phone
-            supplierdetail['email'] = i.email
             supplierdetail['productscope'] = i.productScope
             supplierlist.append(supplierdetail)
         data['supplierlist'] = supplierlist
-        data['realname'] = username
+        data['username'] = username
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
@@ -551,13 +601,16 @@ def caigou_gongyingshangguanli(req):
         data['base_template'] = base_template
         return render(req, 'caigou_gongyingshangguanli.html', data)
     else:
+        username = req.POST.get('username')
+        password = req.POST.get('password')
+        user = User.objects.create(userName = username, userPassword=password, userRole_id = 7)
         suppliercompany = req.POST.get('suppliercompany')
         linkman = req.POST.get('linkman')
         address = req.POST.get('address')
         phone = req.POST.get('phone')
         email = req.POST.get('email')
         productscope = req.POST.get('productscope')
-        Supplier.objects.create(supplierName=suppliercompany, linkMan=linkman, address=address, phone=phone, email=email, productScope=productscope)
+        Supplier.objects.create(supplierName=suppliercompany, linkMan=linkman, address=address, phone=phone, email=email, productScope=productscope,user = user)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -577,13 +630,14 @@ def caigou_suppliermodify(req):
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
-
 # 采购管理_供应商删除
 @csrf_exempt
 def caigou_supplierdel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        Supplier.objects.filter(id=id).delete()
+        user = Supplier.objects.get(id=id).user
+        Supplier.objects.get(id=id).delete()
+        user.delete()
         data = {}
         data['result'] = 'post_success'
         data['id'] = id
