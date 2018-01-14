@@ -53,6 +53,7 @@ class Product(models.Model):
     productName = models.CharField(max_length=50)
     productSize = models.CharField(max_length=20)
     stock = models.IntegerField()
+    # stocking = models.IntegerField()
     safastock = models.IntegerField()
     saleprice = models.FloatField()
 #订单明细表
@@ -83,18 +84,21 @@ class OutdemandDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     outNum = models.IntegerField()
 
-#再订货单表
-class Againpurchase(models.Model):
+#再订货通知单表
+class Againpurchasenotice(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
-    supplier = models.ForeignKey(Supplier,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    num = models.IntegerField()
     addTime = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20)
 
-#再订货单明细
-class AgainpurchaseDetail(models.Model):
-    againpurchase = models.ForeignKey(Againpurchase, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    purchaseNum = models.IntegerField()
+#再订货单表
+class Againpurchase(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    againpurchasenotice = models.ForeignKey(Againpurchasenotice,on_delete=models.CASCADE)
+    supplier = models.ForeignKey(Supplier,on_delete=models.CASCADE)
+    addTime = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20)
 
 # 应付账款表
 class Payable(models.Model):
@@ -107,7 +111,6 @@ class Payable(models.Model):
 class PayableDetail(models.Model):
     payable = models.ForeignKey(Payable, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    productName = models.CharField(max_length=50)
     unitPrice = models.FloatField()
     salsAmount = models.IntegerField()
     totalsales = models.FloatField()
@@ -121,7 +124,6 @@ class Receivable(models.Model):
 class ReceivableDetail(models.Model):
     receivable = models.ForeignKey(Receivable, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    productName = models.CharField(max_length=50)
     unitPrice = models.FloatField()
     salsAmount = models.IntegerField()
     totalsales = models.FloatField()
@@ -131,6 +133,7 @@ class Purchase_account(models.Model):
     payable = models.ForeignKey(Payable, on_delete=models.CASCADE)
     addTime = models.DateTimeField(auto_now=True)
     totalAccount = models.FloatField()
+
 # 销售业务帐
 class SaleAccount(models.Model):
     receivable = models.ForeignKey(Receivable, on_delete=models.CASCADE)

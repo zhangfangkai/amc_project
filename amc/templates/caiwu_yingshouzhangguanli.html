@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            管理员>财务管理>应收账款管理
+            财务管理>应收账款管理
              <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
@@ -37,32 +37,59 @@
                 </ul>
             </div>
             <div class="smart-widget-body">
+                    <!-- orderdetail -->
+            <div class="modal fade" id="orderdetail">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">订单详情</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table id="orderdetailtable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>产品名称</th>
+                                        <th>单价</th>
+                                        <th>数量</th>
+                                        <th>总价</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody id = "orderdetailbody">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>应收账编号</th>
-                        <th>备货单编号</th>
-                        <th>开单时间</th>
-                        <th>收款状态</th>
+                        <th>编号</th>
+                        <th>顾客名称</th>
                         <th>应收总额</th>
+                        <th>时间</th>
+                        <th>状态</th>
                         <th>操作</th>
-
                     </tr>
                     </thead>
                     <tbody>
                     {% for i in yingshouzhanglist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.bhid }}</td>
-                            <td>{{ i.time }}</td>
+                            <td>{{ i.customer}}</td>
+                            <td>{{ i.sum}}</td>
+                            <td>{{ i.time|date:"Y-m-d H:i" }}</td>
                             <td>{{ i.status }}</td>
-                            <td>{{ i.total }}</td>
-
-{#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
-{#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">查看详情</button>
-                            <button class="btn btn-info btn-xs zhifu">确认收款</button>
+                                <button class="btn btn-info btn-xs detail">详情</button>
+                                <button class="btn btn-info btn-xs zhifu">催款</button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -72,42 +99,35 @@
             </div>
         </div><!-- ./smart-widget-inner -->
     </div><!-- ./smart-widget -->
-    </div><!-- ./padding-md -->
-    </div><!-- /main-container -->
-    <footer class="footer">
-        <span class="footer-brand">
-            <strong class="text-danger">Simplify</strong> Admin
-        </span>
-        <p class="no-margin">
-            &copy; 2014 <strong>Simplify Admin</strong>. ALL Rights Reserved.
-        </p>
-    </footer>
-    </div><!-- /wrapper -->
+
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
      <script type="text/javascript">
-     $('.zhifu').on('click',function () {
-
-                var tr = $(this).parents("tr")
-                var id = tr.attr("id")
-                $.ajax({
-                    url: '/pools/sales_orderzhifu',
-                    type: 'POST',
-                    data: {orderid: id},
-                    dataType: 'json',
-                    timeout: 10000,
-                    success: function (result) {
-                        if (result.result == "post_success") {
-    window.location.reload();
-
-                        } else {
-                            alert('修改未成功');
-                        }
+     $('.detail').on('click',function () {
+         var tr = $(this).parents("tr");
+         var id = tr.attr("id");
+         $.ajax({
+             url: '/pools/caiwu_yingshouzhangguanli',
+             type: 'POST',
+             data: {id: id},
+             dataType: 'json',
+             timeout: 10000,
+             success: function (result) {
+                 if (result.result == "post_success") {
+                     var detail = result.detail;
+                    $('#orderdetailbody').html("");
+                    var str = "";
+                    for (i in detail){
+                        str+="<tr><td>"+ detail[i].product+"</td><td>"+detail[i].unitprice+"</td><td>"+detail[i].salsAmount+"</td><td>"+detail[i].totalsales+"</td></tr>"
                     }
-                });
-
-
-        })
+                    $('#orderdetailbody').append(str);
+                    $("#orderdetail").modal()
+                 } else {
+                     alert('修改未成功');
+                 }
+             }
+         });
+     })
      </script>
 
 {% endblock %}

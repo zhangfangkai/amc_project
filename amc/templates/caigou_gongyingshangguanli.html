@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            管理员>供应商管理
+            采购管理>供应商管理
              <span class="smart-widget-option">
                 <button data-target="#addsupplier" data-toggle="modal" class="btn btn-info btn-sm">添加供应商</button>
                 <span class="refresh-icon-animated">
@@ -133,14 +133,127 @@
                                     <input class="form-control" id="modproductscope" placeholder="请输入产品范围">
                                 </div>
 				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="productscope">信用水平</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modcredit" placeholder="请输入信用水平">
+                                </div>
+				  			</div>
 		        		</form>
                         <a id='modsupplier'class="btn btn-danger block m-top-md">修改</a>
 		      		</div>
 		    	</div>
 		  	</div>
 		</div>
+        <!-- supplierdetail-->
+		<div class="modal fade" id="supplierdetail" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">供应商详细信息</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  method="post" role="form" class="form-horizontal">
+                            <input id="modid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="suppliername">供应商单位名称</label>
+                                <div class="col-sm-8" >
+                                    <label class="control-label" style="font-weight: lighter" id="suppliercompanydetail" ></label>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="linkman">联系人</label>
+                                 <div class="col-sm-8">
+                                     <label class="control-label" style="font-weight: lighter" id="linkmandetail" ></label>
+                                 </div>
+                            </div>
+                            <div class="form-group"><label class="control-label col-sm-3" for="address">联系地址</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" style="font-weight: lighter" id="addressdetail" ></label>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="phone">联系电话</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" style="font-weight: lighter" id="phonedetail" ></label>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="email">电子邮件</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" style="font-weight: lighter" id="emaildetail" ></label>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="productscope">产品范围</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" style="font-weight: lighter" id="productscopedetail" ></label>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="productscope">信用水平</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label" style="font-weight: lighter" id="creditdetail" ></label>
+                                </div>
+				  			</div>
+		        		</form>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+        <!-- bjdetail-->
+		<div class="modal fade" id="bjdetail" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">供应商报价详情</h4>
+		      		</div>
+		      		<div class="modal-body">
+                         <table id="sutopro" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>产品</th>
+                                        <th>价格</th>
+                                    </tr>
+                                </thead>
+                                <tbody id = "sutoprobody">
 
+                                </tbody>
+                            </table>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+         <!-- bjmanage-->
+		<div class="modal fade" id="bjmanage" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">供应商报价修改</h4>
+		      		</div>
+		      		<div class="modal-body">
+                         <table id="sutopromodi" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>产品</th>
+                                        <th>价格</th>
+                                        <th>操作</th>
 
+                                    </tr>
+                                </thead>
+                                <tbody id = "sutopromodibody">
+
+                                </tbody>
+                            </table>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
                 <ul class="widget-color-list clearfix">
@@ -161,12 +274,13 @@
                     <thead>
                     <tr>
                         <th>编号</th>
-                        <th>用户名<th>
+                        <th>用户名</th>
                         <th>单位名称</th>
                         <th>联系人</th>
                         <th>联系电话</th>
                         <th>产品范围</th>
                         <th>操作</th>
+                        <th>报价</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -179,9 +293,12 @@
                             <td>{{ i.phone }}</td>
                             <td>{{ i.productscope }}</td>
                             <td>
-                                <button class="btn btn-info btn-xs xiangqing">详情</button>
+                                <button class="btn btn-info btn-xs detail">详情</button>
                                 <button class="btn btn-info btn-xs xiugai">修改</button>
                                 <button class="btn btn-info btn-xs del">删除</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-info btn-xs bjmanage">管理</button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -260,20 +377,57 @@
         $('.xiugai').on('click',function (){
             var tr = $(this).parents("tr");
             var id = tr.attr("id");
-            var suppliercompany = tr.children("td").eq(1).text();
-            var linkman = tr.children("td").eq(2).text();
-            var address = tr.children("td").eq(3).text();
-            var phone = tr.children("td").eq(4).text();
-            var email = tr.children("td").eq(5).text();
-            var productscope = tr.children("td").eq(6).text();
-            $('#modsuppliercompany').val(suppliercompany);
-            $('#modlinkman').val(linkman);
-            $('#modaddress').val(address);
-            $('#modphone').val(phone);
-            $('#modemail').val(email);
-            $('#modproductscope').val(productscope);
-            $("#modid").val(id)
-            $("#modisupplier").modal()
+            $.ajax({
+                    url: '/pools/caigou_supplierdetail',
+                    type: 'POST',
+                    data: {"id":id },
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (data) {
+                        if (data.result == "post_success") {
+                            $('#modsuppliercompany').val(data.supplierName);
+                            $('#modlinkman').val(data.linkMan);
+                            $('#modphone').val(data.phone);
+                            $('#modaddress').val(data.address);
+                            $('#modemail').val(data.email);
+                            $('#modproductscope').val(data.productScope);
+                            $("#modid").val(data.id)
+                            $("#modcredit").val(data.credit)
+                            $("#modisupplier").modal()
+                        } else {
+                            alert('操作未成功');
+                        }
+                    }
+                });
+        });
+        $('.detail').on('click',function (){
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                    url: '/pools/caigou_supplierdetail',
+                    type: 'POST',
+                    data: {"id":id },
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (data) {
+                        if (data.result == "post_success") {
+                            $('#suppliercompanydetail').html(data.supplierName);
+                            $('#linkmandetail').html(data.linkMan);
+                            $('#phonedetail').html(data.phone);
+                            $('#addressdetail').html(data.address);
+                            $('#emaildetail').html(data.email);
+                            $('#productscopedetail').html(data.productScope);
+                            $("#creditdetail").html(data.credit)
+                            $("#supplierdetail").modal()
+                        } else {
+                            alert('操作未成功');
+                        }
+                    }
+                });
+        });
+        $('.bjmanage').on('click',function () {
+            var id = $(this).parents("tr").attr("id");
+            location.href = 'bjmanage?id='+ id;
         });
         $('#modsupplier').on('click',function () {
             var suppliercompany = $('#modsuppliercompany').val();
@@ -282,6 +436,7 @@
             var phone = $('#modphone').val();
             var email = $('#modemail').val();
             var productscope = $('#modproductscope').val();
+            var credit = $('#modcredit').val();
             if(suppliercompany==''){
                 $("#modsuppliercompany").focus();
             }else if(linkman==''){
@@ -294,7 +449,9 @@
                 $("#modemail").focus();
             }else if(productscope==''){
                 $("#modproductscope").focus();
-            }else{
+            }else if(credit==''){
+                $("#modcredit").focus();
+            } else{
                 var data = {};
                 data['id'] = $("#modid").val();
                 data['suppliercompany']=suppliercompany;
@@ -303,6 +460,7 @@
                 data['phone']=phone;
                 data['email']=email;
                 data['productscope']=productscope;
+                data['credit'] = credit;
                 $.ajax({
                     url: '/pools/caigou_suppliermodify',
                     type: 'POST',

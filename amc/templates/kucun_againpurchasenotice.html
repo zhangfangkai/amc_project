@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            管理员>采购管理>缺货单管理
+            库存管理>再订货通知单管理
              <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
@@ -40,33 +40,26 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>缺货单编号</th>
-                        <th>订单编号</th>
+                        <th>编号</th>
+                        <th>产品名称</th>
+                        <th>产品型号</th>
                         <th>添加时间</th>
-                        <th>缺货产品名称</th>
-                        <th>缺货数量</th>
-                        <th>缺货单状态</th>
-                        <th>添加用户</th>
+                        <th>数量</th>
+                        <th>状态</th>
                         <th>操作</th>
-
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in quehuodanlist %}
+                    {% for i in againnotice %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.oid }}</td>
-                            <td>{{ i.time }}</td>
-                            <td>{{ i.pname }}</td>
-                            <td>{{ i.qnum }}</td>
+                            <td>{{ i.productname }}</td>
+                            <td>{{ i.productsize }}</td>
+                            <td>{{ i.time|date:"Y-m-d" }}</td>
+                            <td>{{ i.num }}</td>
                             <td>{{ i.status }}</td>
-                            <td>{{ i.user }}</td>
-{#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
-{#                            <td>发布/未发布</td>#}
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">修改</button>
-                            <button class="btn btn-info btn-xs zhifu">查看</button>
-                            <button class="btn btn-info btn-xs zhifu">删除</button>
+                                <button class="btn btn-info btn-xs del">删除</button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -89,31 +82,30 @@
     </div><!-- /wrapper -->
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
-    <script type="text/javascript">
-     $('.zhifu').on('click',function () {
-
-                var tr = $(this).parents("tr")
-                var id = tr.attr("id")
+     <script type="text/javascript">
+         $(".modal").draggable();
+         $('.del').on('click',function () {
+            var r=confirm("警告：您确定要删除此再订货通知单吗？（此操作不可恢复）");
+            if (r==true) {
+                var tr = $(this).parents("tr");
+                var id = tr.attr("id");
                 $.ajax({
-                    url: '/pools/sales_orderzhifu',
+                    url: '/pools/kucun_againnoticedel',
                     type: 'POST',
-                    data: {orderid: id},
+                    data: {id: id},
                     dataType: 'json',
                     timeout: 10000,
                     success: function (result) {
                         if (result.result == "post_success") {
-    window.location.reload();
-
+                            document.getElementById(result.id).remove();
                         } else {
-                            alert('修改未成功');
+                            alert('删除未成功');
                         }
                     }
                 });
+            }
 
-
-        })
-
-
-    </script>
+        });
+     </script>
 
 {% endblock %}

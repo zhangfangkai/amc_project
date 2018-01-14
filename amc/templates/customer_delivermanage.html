@@ -2,8 +2,10 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            库存管理>发货单管理
-             <span class="smart-widget-option">
+            客户>发货单管理
+            <span class="smart-widget-option">
+                <button data-target="#addorder" data-toggle="modal" class="btn btn-info btn-sm">添加订单</button>
+
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
@@ -22,7 +24,21 @@
             </span>
         </div>
         <div class="smart-widget-inner">
-            <!-- fahuodandetail -->
+            <div class="smart-widget-hidden-section">
+                <ul class="widget-color-list clearfix">
+                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
+                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
+					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
+					<li style="background-color:#2baab1;" data-color="widget-green"></li>
+					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
+					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
+					<li style="background-color:#e36159;" data-color="widget-red"></li>
+					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
+					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
+					<li style="background-color:#fff;" data-color="reset"></li>
+                </ul>
+            </div>
+                <!-- fahuodandetail -->
             <div class="modal fade" id="fahuodetailmodal">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -72,55 +88,96 @@
                     </div>
                 </div>
             </div>
-            <div class="smart-widget-hidden-section">
-                <ul class="widget-color-list clearfix">
-                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
-                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
-					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
-					<li style="background-color:#2baab1;" data-color="widget-green"></li>
-					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
-					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
-					<li style="background-color:#e36159;" data-color="widget-red"></li>
-					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
-					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
-					<li style="background-color:#fff;" data-color="reset"></li>
-                </ul>
-            </div>
             <div class="smart-widget-body">
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>发货单编号</th>
-                        <th>客户名称</th>
-                        <th>发货时间</th>
+                        <th>编号</th>
+                        <th>收货人</th>
+                        <th>收货地址</th>
+                        <th>时间</th>
                         <th>状态</th>
                         <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in fahuodanlist %}
+                    {% for i in saleslist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.customer }}</td>
-                            <td>{{ i.time|date:"Y-m-d" }}</td>
+                            <td>{{ i.receiver }}</td>
+                            <td>{{ i.receaddress }}</td>
+                            <td>{{ i.time|date:"Y-m-d H:i" }}</td>
                             <td>{{ i.status }}</td>
                             <td>
-                            <button class="btn btn-info btn-xs detail">详情</button>
+                                <button class="btn btn-info btn-xs shouhuo">已收货</button>
+                                <button class="btn btn-info btn-xs pay">付款</button>
+                                <button class="btn btn-info btn-xs xiangqing">详情</button>
                             </td>
                         </tr>
                     {% endfor %}
-
                     </tbody>
                 </table>
             </div>
         </div><!-- ./smart-widget-inner -->
     </div><!-- ./smart-widget -->
-    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
-     <script type="text/javascript">
-        $(".modal").draggable();
+    </div><!-- ./padding-md -->
+    </div><!-- /main-container -->
+    <footer class="footer">
+        <span class="footer-brand">
+            <strong class="text-danger">Simplify</strong> Admin
+        </span>
+        <p class="no-margin">
+            &copy; 2014 <strong>Simplify Admin</strong>. ALL Rights Reserved.
+        </p>
+    </footer>
+    </div><!-- /wrapper -->
 
-      $('.detail').on('click',function () {
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+        $(".modal").draggable();
+        $('.shouhuo').on('click',function () {
+            var sta = $(this).parent().prev().get(0);
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                url: '/pools/customer_delivermanage',
+                type: 'POST',
+                data: {'orderid': id,'status':"已收货"},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (result) {
+                    if (result == "post_success") {
+                        sta.innerHTML = "已收货";
+                    } else {
+                        alert('操作未成功');
+                    }
+                }
+            });
+        });
+        $('.pay').on('click',function () {
+            var sta = $(this).parent().prev().get(0);
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                url: '/pools/customer_delivermanage',
+                type: 'POST',
+                data: {'orderid': id,'status':"已付款"},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (result) {
+                    if (result == "post_success") {
+                        sta.innerHTML = "已付款";
+                    } else {
+                        alert('操作未成功');
+                    }
+                }
+            });
+        });
+
+
+    $('.xiangqing').on('click',function () {
         var id = $(this).parents("tr").attr("id");
+        console.log("111111");
         $.ajax({
             url: '/pools/kucun_fahuodanguanli',
             type: 'POST',
@@ -148,6 +205,5 @@
         })
 
     });
-     </script>
-
+    </script>
 {% endblock %}

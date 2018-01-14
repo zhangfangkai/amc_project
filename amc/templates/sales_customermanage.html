@@ -4,7 +4,7 @@
         <div class="smart-widget-header">
             销售管理>客户管理
              <span class="smart-widget-option">
-                <button data-target="#addcustomer" data-toggle="modal" class="btn btn-info btn-sm">添加客户</button>
+                <button data-target="#addcustomermodal" data-toggle="modal" class="btn btn-info btn-sm">添加客户</button>
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
                 </span>
@@ -24,7 +24,7 @@
         </div>
 
         <!-- addcustomer-->
-		<div class="modal fade" id="addcustomer" aria-hidden="true">
+		<div class="modal fade" id="addcustomermodal" aria-hidden="true">
 		  	<div class="modal-dialog modal-sm">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -187,6 +187,7 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
+        $(".modal").draggable();
 
         $('#addcustomer').on('click',function(){
             var customerusername = $('#customerusername').val();

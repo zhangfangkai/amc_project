@@ -1,0 +1,216 @@
+{% extends base_template %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+            报价管理
+            <span class="smart-widget-option">
+                <button data-target="#addcprice" data-toggle="modal" class="btn btn-info btn-sm">添加产品报价</button>
+
+                <span class="refresh-icon-animated">
+                    <i class="fa fa-circle-o-notch fa-spin"></i>
+                </span>
+                <a href="#" class="widget-toggle-hidden-option">
+                    <i class="fa fa-cog"></i>
+                </a>
+                <a href="#" class="widget-collapse-option" data-toggle="collapse">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a href="#" class="widget-refresh-option">
+                    <i class="fa fa-refresh"></i>
+                </a>
+                <a href="#" class="widget-remove-option">
+                    <i class="fa fa-times"></i>
+                </a>
+            </span>
+        </div>
+        <div class="smart-widget-inner">
+            <div class="smart-widget-hidden-section">
+                <ul class="widget-color-list clearfix">
+                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
+                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
+					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
+					<li style="background-color:#2baab1;" data-color="widget-green"></li>
+					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
+					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
+					<li style="background-color:#e36159;" data-color="widget-red"></li>
+					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
+					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
+					<li style="background-color:#fff;" data-color="reset"></li>
+                </ul>
+            </div>
+                <!-- addprotoprice-->
+		<div class="modal fade" id="addcprice" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">添加产品报价</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='priceaddform' method="post" role="form" class="form-horizontal">
+                            <div class="form-group">
+                                <input type="hidden" id="supplierid" value={{ user_id }}>
+                                <label class="control-label col-sm-3" for="phone">产品</label>
+                                <div class="col-sm-8">
+                                    <select  id="product" class="form-control">
+                                                    {% for i in productlist %}
+                                                        <option value = {{ i }}>{{ i }} </option>
+                                                    {% endfor %}
+                                    </select>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="email">报价</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="price" placeholder="请输入价格">
+                                </div>
+				  			</div>
+		        		</form>
+                        <a id='addprice'class="btn btn-danger block m-top-md">添加</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+                <!-- modprice-->
+		<div class="modal fade" id="modprice" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">修改产品报价</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form  id='pricemodform' method="post" role="form" class="form-horizontal">
+                            <input type="hidden" id="modpriceid">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" >报价</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="modproprice" placeholder="请输入价格">
+                                </div>
+				  			</div>
+		        		</form>
+                        <a id='pricemod'class="btn btn-danger block m-top-md">修改</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+            <div class="smart-widget-body">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                         <th>编号</th>
+                        <th>产品名称</th>
+                        <th>产品型号</th>
+                        <th>报价</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in protosup %}
+                        <tr id="{{ i.id }}">
+                            <td>{{ i.id }}</td>
+                            <td>{{ i.productname }}</td>
+                            <td>{{ i.productsize }}</td>
+                            <td>{{ i.price }}</td>
+                            <td>
+                                <button class="btn btn-info btn-xs xiugai">修改</button>
+                                <button class="btn btn-info btn-xs del">删除</button>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+    </div><!-- ./padding-md -->
+    </div><!-- /main-container -->
+    <footer class="footer">
+        <span class="footer-brand">
+            <strong class="text-danger">Simplify</strong> Admin
+        </span>
+        <p class="no-margin">
+            &copy; 2014 <strong>Simplify Admin</strong>. ALL Rights Reserved.
+        </p>
+    </footer>
+    </div><!-- /wrapper -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+
+    $('#addprice').on('click',function () {
+        var data={};
+        data['product'] = $('#product').val();
+        data['price'] = $('#price').val();
+        data['id'] = $('#supplierid').val();
+
+        $.ajax({
+                url: '/pools/bjmanage',
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                timeout: 10000,
+                success: function (data) {
+                    if (data == "post_success") {
+                        window.location.reload();
+                    } else {
+                        alert('操作未成功');
+                    }
+                }
+            });
+    });
+    $('.del').on('click',function(){
+        var r=confirm("警告：您确定要删除此报价吗？（此操作不可恢复）");
+        if (r==true) {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                url: '/pools/bjdel',
+                type: 'POST',
+                data: {id: id},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (data) {
+                    if (data.result == "post_success") {
+                        document.getElementById(data.id).remove();
+                    } else {
+                        alert('删除未成功');
+                    }
+                }
+            });
+        }
+
+    });
+
+    $('.xiugai').on('click',function () {
+        var tr = $(this).parents("tr");
+        var id = tr.attr("id");
+        $('#modpriceid').val(id);
+        $('#modprice').modal();
+    });
+    $('#pricemod').on('click',function () {
+        var id = $('#modpriceid').val();
+        var price = $('#modproprice').val();
+        data={};
+        data['id'] = id;
+        data['price'] = price;
+        $.ajax({
+            url: '/pools/bjmod',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            timeout: 10000,
+            success: function (data) {
+                if (data.result == "post_success") {
+                        window.location.reload();
+                } else {
+                    alert('操作未成功');
+                }
+            }
+        })
+
+    });
+
+    </script>
+{% endblock %}

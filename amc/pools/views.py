@@ -9,7 +9,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 import json
+from django.db.models import Sum
 from django.utils import timezone
+import datetime
 
 
 
@@ -39,6 +41,41 @@ def login(req):
             req.session['username'] = username
             data = {}
             data['username'] = username
+            today = datetime.date.today()
+            daylist = []
+            conutlist = []
+            purchasepricelist = []
+            paylist = []
+            for i in range(0, 7):
+                temp = 0
+                temp2 = 0
+                oneday = datetime.timedelta(days=i)
+                yesterday = today - oneday
+                year = yesterday.year
+                month = yesterday.month
+                day = yesterday.day
+                purprice = Purchase_account.objects.filter(addTime__year=year, addTime__month=month,
+                                                           addTime__day=day).aggregate(Sum('totalAccount'))
+                pay = SaleAccount.objects.filter(addTime__year=year, addTime__month=month, addTime__day=day).aggregate(
+                    Sum('totalAccount'))
+                count = Order.objects.filter(orderTime__year=year, orderTime__month=month, orderTime__day=day).count()
+                ayesterday = yesterday.strftime("%Y-%m-%d")
+                conutlist.append(count)
+                if purprice.values()[0] == None:
+                    temp = 0
+                else:
+                    temp = purprice.values()[0]
+                if pay.values()[0] == None:
+                    temp2 = 0
+                else:
+                    temp2 = pay.values()[0]
+                purchasepricelist.append(temp)
+                paylist.append(temp2)
+                daylist.append(ayesterday)
+            data['daylist'] = daylist
+            data['countlist'] = conutlist
+            data['paylist'] = paylist
+            data['purchasepricelist'] = purchasepricelist
             if userRoleid == 1:
                 return render(req, 'admin_base.html', data)
             elif userRoleid ==2:
@@ -49,6 +86,10 @@ def login(req):
                 return render(req, 'caiwu_base.html', data)
             elif userRoleid == 5:
                 return render(req, 'caigou_base.html', data)
+            elif userRoleid == 6:
+                return render(req, 'customer_base.html', data)
+            elif userRoleid == 7:
+                return render(req, 'supplier_base.html', data)
             else:
                 return render(req, 'login.html', {})
         else:
@@ -88,7 +129,6 @@ def admin_employeemanage(req):
 @csrf_exempt
 def admin_userdelete(req):
     if req.method == 'POST':
-        print "keyi shanchu"
         user_id = req.POST.get('userid')
         user = User.objects.filter(id=user_id)
         Employee.objects.filter(user = user ).delete()
@@ -101,7 +141,6 @@ def admin_userdelete(req):
 @csrf_exempt
 def admin_modify(req):
     if req.method == 'POST':
-        print "keyixiugai"
         username = req.POST.get('username')
         password = req.POST.get('password')
         realname = req.POST.get('realname')
@@ -111,7 +150,6 @@ def admin_modify(req):
         User.objects.filter(id=user_id).update(userName=username, userPassword=password,
                                                userRole_id=juese)
         Employee.objects.filter(user_id = user_id).update(employName = realname,employDepart = userdepart)
-
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -164,20 +202,124 @@ def sales_ordermanage(req):
             order = Order.objects.filter(id=orderid)
             orderdetail = Order_detail.objects.filter(order=order)
             tag = 1
+            tag2 = 0
             for i in orderdetail:
                 kucun = i.product.stock
                 shuliang = i.orderNum
+                if kucun!=0:
+                    tag2 = 1
                 if (kucun-shuliang)<0:
                     tag = 0
-                    break
-            if tag == 1:
-                result = 1
-            else:
-                result = 2
+            if tag2 == 0:
+                tag = 2
+            elif tag2==1 and tag == 0:
+                tag = 0
+            #tag =0,部分缺货；1,不缺货；2，完全缺货
             data={}
-            data['result']=result
+            data['result']=tag
             data['id']=orderid
             return HttpResponse(json.dumps(data), content_type='application/json')
+
+@csrf_exempt
+def customer_ordermanage(req):
+    if req.method == 'GET':
+        user_id = req.session['user_id']
+        username = req.session['username']
+        data = {}
+        data['username'] = username
+        user=User.objects.get(id =user_id)
+        customer = Customer.objects.get(user=user)
+        sales = Order.objects.filter(customer = customer).order_by("-orderTime")
+        saleslist = []
+        for i in sales:
+            salesdetail = {}
+            salesdetail['id'] = i.id
+            salesdetail['user'] = i.user.userName
+            salesdetail['customername'] = i.customer.customerName
+            salesdetail['receaddress'] = i.receAddress
+            salesdetail['ordertime'] = i.orderTime
+            salesdetail['status'] = i.status
+            saleslist.append(salesdetail)
+        data['saleslist'] = saleslist
+        product = Product.objects.all()
+        productlist = []
+        for k in product:
+            productlist.append(k.productName)
+        data['productlist'] = productlist
+        base_template = 'customer_base.html'
+        data['base_template'] = base_template
+        return render(req, 'customer_ordermanage.html', data)
+    else:
+        orderid = req.POST.get('orderid')
+        status = req.POST.get('status')
+        if status == "已收货" or status == "已付款":
+            Order.objects.filter(id=orderid).update(status=status)
+            result = "post_success"
+            return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+@csrf_exempt
+def customer_delivermanage(req):
+    if req.method == 'GET':
+        user_id = req.session['user_id']
+        username = req.session['username']
+        data = {}
+        data['username'] = username
+        user = User.objects.get(id=user_id)
+        customer = Customer.objects.get(user=user)
+        deliver = []
+        deliverlist = Deliver.objects.all().order_by("-addTime")
+        for j in deliverlist:
+            if j.order.customer ==customer:
+                deliver.append(j)
+        saleslist = []
+        for i in deliver:
+            salesdetail = {}
+            salesdetail['id'] = i.id
+            salesdetail['receiver'] = i.order.receiver
+            salesdetail['receaddress'] = i.order.receAddress
+            salesdetail['time'] = i.addTime
+            salesdetail['status'] = i.status
+            saleslist.append(salesdetail)
+        data['saleslist'] = saleslist
+        base_template = 'customer_base.html'
+        data['base_template'] = base_template
+        return render(req, 'customer_delivermanage.html', data)
+    else:
+        orderid = req.POST.get('orderid')
+        status = req.POST.get('status')
+        if status == "已收货" or status == "已付款":
+            Deliver.objects.filter(id=orderid).update(status=status)
+            result = "post_success"
+            return HttpResponse(json.dumps(result), content_type='application/json')
+
+
+# 客户-增加订单
+@csrf_exempt
+def customer_addorder(req):
+    if req.method == "POST":
+        rows = req.POST.get('rows')
+        user_id = req.session['user_id']
+        user = User.objects.get(id=user_id)
+        customer = Customer.objects.get(user = user)
+        customeraddress = req.POST.get('customeraddress')
+        shouhuoname = req.POST.get('shouhuoname')
+        order = customer.order_set.create(receAddress=customeraddress, receiver=shouhuoname,
+                                          orderTime=timezone.now(), status="待审核", user=user, sumprice=0)
+        sumprice = 0
+        for i in range(0, int(rows)):
+            tempproname = 'productname' + str(i)
+            temppronum = 'productnum' + str(i)
+            productname = req.POST.get(tempproname)
+            productnum = req.POST.get(temppronum)
+            product = Product.objects.filter(productName=productname)[0]
+            price = product.saleprice * int(productnum)
+            sumprice = sumprice + price
+            order.order_detail_set.create(product=product, orderNum=productnum)
+        Order.objects.filter(id=order.id).update(sumprice=sumprice)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
 
 # 销售管理-成功发货
 @csrf_exempt
@@ -187,18 +329,18 @@ def sales_successfahuo(req):
         userid = req.session['user_id']
         order = Order.objects.get(id=order_id)
         user = User.objects.get(id = userid)
-        order.update(status = "已发货",)
+        Order.objects.filter(id = order_id).update(status = "已发货")
         deliver=Deliver.objects.create(order = order,user = user,addTime = timezone.now(),status = "已发货")
         orderdetail = order.order_detail_set.all()
         for i in orderdetail:
             stock = i.product.stock-i.orderNum
-            i.product.update(stock = stock)
+            Product.objects.filter(id = i.product.id).update(stock = stock)
             DeliverDatail.objects.create(deliver = deliver,product = i.product,deliverNum = i.orderNum)
         data = {}
         data['result'] = 'post_success'
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-# 销售管理-部分发货开缺货单单
+# 销售管理-部分发货开缺货单
 @csrf_exempt
 def sales_unsuccessfahuo(req):
     if req.method == "POST":
@@ -207,21 +349,40 @@ def sales_unsuccessfahuo(req):
         order = Order.objects.get(id=order_id)
         user = User.objects.get(id=userid)
         Order.objects.filter(id = order_id).update(status="部分发货")
-        deliver = Deliver.objects.create(order=order, user=user, addTime=timezone.now(), status="部分发货")
+        deliver = Deliver.objects.create(order=order, user=user, addTime=timezone.now(), status="已发货")
         outdemand = OutDemand.objects.create(order = order,user = user,addTime = timezone.now(),status ="缺货")
         orderdetail = order.order_detail_set.all()
         for i in orderdetail:
-            stock = i.product.stock - i.orderNum
-            if stock>=0:
-                Product.objects.filter(id=i.product.id).update(stock=stock)
+            stock = i.product.stock
+            res = i.product.stock - i.orderNum
+            if stock == 0:
+                OutdemandDetail.objects.create(outDemand = outdemand,product = i.product,outNum = (0-res))
+            elif res >= 0:
+                Product.objects.filter(id=i.product.id).update(stock=res)
                 DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.orderNum)
             else:
                 DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.product.stock)
                 Product.objects.filter(id=i.product.id).update(stock=0)
-                OutdemandDetail.objects.create(outDemand = outdemand,product = i.product,outNum = (0-stock))
+                OutdemandDetail.objects.create(outDemand = outdemand,product = i.product,outNum = (0-res))
         data = {}
         data['result'] = 'post_success'
-        print "nihao"
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+# 销售管理-完全缺货开缺货单
+@csrf_exempt
+def sales_wqquehuo(req):
+    if req.method == "POST":
+        order_id = req.POST.get('id')
+        userid = req.session['user_id']
+        order = Order.objects.get(id=order_id)
+        user = User.objects.get(id=userid)
+        Order.objects.filter(id=order_id).update(status="缺货")
+        outdemand = OutDemand.objects.create(order=order, user=user, addTime=timezone.now(), status="缺货")
+        orderdetail = order.order_detail_set.all()
+        for i in orderdetail:
+            OutdemandDetail.objects.create(outDemand=outdemand, product=i.product, outNum=i.orderNum)
+        data = {}
+        data['result'] = 'post_success'
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -245,12 +406,9 @@ def sales_addorder(req):
             productname = req.POST.get(tempproname)
             productnum = req.POST.get(temppronum)
             product = Product.objects.filter(productName=productname)[0]
-            print i, productname, productnum
-            print type(product.saleprice)
             price = product.saleprice * int(productnum)
             sumprice = sumprice + price
             order.order_detail_set.create(product=product, orderNum=productnum)
-            print "keyi"
         Order.objects.filter(id = order.id).update(sumprice = sumprice)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
@@ -294,6 +452,7 @@ def sales_orderdetail(req):
 @csrf_exempt
 def sales_customermanage(req):
     if req.method == 'GET':
+        userid = req.session['user_id']
         username = req.session['username']
         data={}
         clist = Customer.objects.all()
@@ -311,7 +470,7 @@ def sales_customermanage(req):
             customerlist.append(customerdetail)
         data['customerlist'] = customerlist
         data['username'] = username
-        user = User.objects.get(userName=username)
+        user = User.objects.get(id=userid)
         if user.userRole_id == 1:
             base_template = 'admin_base.html'
         else:
@@ -319,7 +478,6 @@ def sales_customermanage(req):
         data['base_template'] = base_template
         return render(req, 'sales_customermanage.html', data)
     else:
-        print "111"
         customerusername = req.POST.get('customerusername')
         customerpassword = req.POST.get('customerpassword')
         user = User.objects.create(userName = customerusername, userPassword = customerpassword,userRole_id = 6)
@@ -336,7 +494,6 @@ def sales_customermanage(req):
 @csrf_exempt
 def sales_customermodify(req):
     if req.method == 'POST':
-        print "keyixiugai"
         customername = req.POST.get('customername')
         customeraddress = req.POST.get('customeraddress')
         phone = req.POST.get('phone')
@@ -350,9 +507,8 @@ def sales_customermodify(req):
 @csrf_exempt
 def sales_customerdel(req):
     if req.method == 'POST':
-        print "keyi shanchu"
         id = req.POST.get('id')
-        user = Customer.objects.filter(id=id).user
+        user = Customer.objects.filter(id=id)[0].user
         Customer.objects.filter(id=id).delete()
         user.delete()
         data = {}
@@ -412,13 +568,10 @@ def kucun_productmodify(req):
         productsize = req.POST.get('productsize')
         stock = int(req.POST.get('stock'))
         safestock = int(req.POST.get('safestock'))
-        purchaseprice = req.POST.get('purchaseprice')
         salesprice = req.POST.get('salesprice')
-        supplierid = req.POST.get('supplierid')
-        supplier = Supplier.objects.get(id=supplierid)
         id = req.POST.get('id')
         Product.objects.filter(id=id).update(productName=productname, productSize=productsize, stock=stock, safastock=safestock,
-                               purchasePrice=purchaseprice, saleprice=salesprice, supplier=supplier)
+                                saleprice=salesprice)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -427,7 +580,6 @@ def kucun_productmodify(req):
 @csrf_exempt
 def kucun_productdel(req):
     if req.method == 'POST':
-        print "keyi shanchu"
         id = req.POST.get('id')
         Product.objects.filter(id=id)[0].delete()
         data = {}
@@ -435,116 +587,310 @@ def kucun_productdel(req):
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-
-#库存管理-备货单管理
-def kucun_beihuodanmanage(req):
+# 库存管理-再订货通知单管理
+@csrf_exempt
+def kucun_againpurchasenotice(req):
     if req.method == 'GET':
         username = req.session['username']
-        data={}
-        beihuodan = StocknoticeDetail.objects.all()
-        beihuodanlist = []
+        data = {}
+        againpurchasenotice = Againpurchasenotice.objects.all()
+        noticelist = []
 
-        for i in beihuodan:
-            beihuodandetail={}
-            beihuodandetail['id']= i.id
-            beihuodandetail['pid']= Product.objects.get(id=i.product_id).id
-            beihuodandetail['productname'] = Product.objects.get(id=i.product_id).productName
-            beihuodandetail['number'] = i.stocknoticeNum
-            beihuodandetail['oid']= Stocknotice.objects.get(id=i.stocknotice_id).id
-            beihuodandetail['time'] = Stocknotice.objects.get(id=i.stocknotice_id).addTime
-            beihuodandetail['state'] = Stocknotice.objects.get(id=i.stocknotice_id).status
-            beihuodanlist.append(beihuodandetail)
-        data['beihuodanlist'] = beihuodanlist
-        data['realname'] = username
-        user = User.objects.get(userName=username)
-        if user.userRole_id == 1:
-            base_template = 'admin_base.html'
-        else:
-            base_template = 'kucun_base.html'
-        data['base_template'] = base_template
-        return render(req, 'kucun_beihuodanmanage.html', data)
-
-#库存管理-进货单管理
-def kucun_jinhuodanguanli(req):
-    if req.method == 'GET':
-        username = req.session['username']
-        data={}
-        jinhuodan = PurchaseDatail.objects.all()
-        jinhuodanlist = []
-
-        for i in jinhuodan:
-            jinhuodandetail={}
-            jinhuodandetail['id']= i.id
-            jinhuodandetail['pid']= Product.objects.get(id=i.product_id).id
-            jinhuodandetail['productname'] = Product.objects.get(id=i.product_id).productName
-            jinhuodandetail['number'] = i.purchaseNum
-            jinhuodandetail['time'] = Purchase.objects.get(id=i.purchase_id).addTime
-            jinhuodandetail['state'] = Purchase.objects.get(id=i.purchase_id).status
-            jinhuodanlist.append(jinhuodandetail)
-        data['jinhuodanlist'] = jinhuodanlist
-        data['realname'] = username
+        for i in againpurchasenotice:
+            detail = {}
+            detail['id'] = i.id
+            detail['productname'] =i.product.productName
+            detail['productsize'] = i.product.productSize
+            detail['num'] = i.num
+            detail['time'] = i.addTime
+            detail['status'] = i.status
+            noticelist.append(detail)
+        data['againnotice'] = noticelist
+        data['username'] = username
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
             base_template = 'kucun_base.html'
         data['base_template'] = base_template
-        return render(req, 'kucun_jinhuodanguanli.html', data)
+        return render(req, 'kucun_againpurchasenotice.html', data)
+    else:
+        id = req.POST.get('id')
+        num = req.POST.get('num')
+        user_id = req.session['user_id']
+        user = User.objects.get(id = user_id)
+        product = Product.objects.get(id = id)
+        Againpurchasenotice.objects.create(user = user, product =product, num = num, status = "未处理")
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 库存管理-再订货通知单删除
+@csrf_exempt
+def kucun_againnoticedel(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        Againpurchasenotice.objects.filter(id = id).delete()
+        result = 'post_success'
+        data = {}
+        data['result']=result
+        data['id']=id
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 #库存管理-发货单管理
+@csrf_exempt
 def kucun_fahuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        fahuodan = DeliverDatail.objects.all()
+        fahuodan = Deliver.objects.all()
         fahuodanlist = []
 
         for i in fahuodan:
             fahuodandetail={}
             fahuodandetail['id']= i.id
-            fahuodandetail['oid'] = Order.objects.get(id=i.deliver_id).id
-            fahuodandetail['pid']= Product.objects.get(id=i.product_id).id
-            fahuodandetail['productname'] = Product.objects.get(id=i.product_id).productName
-            fahuodandetail['number'] = i.deliverNum
-            fahuodandetail['time'] = Deliver.objects.get(id=i.deliver_id).addTime
-            fahuodandetail['state'] = Deliver.objects.get(id=i.deliver_id).status
+            fahuodandetail['time'] = i.addTime
+            fahuodandetail['status'] = i.status
+            fahuodandetail['customer'] = i.order.customer.customerName
             fahuodanlist.append(fahuodandetail)
         data['fahuodanlist'] = fahuodanlist
-        data['realname'] = username
+        data['username'] = username
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
             base_template = 'kucun_base.html'
         data['base_template'] = base_template
         return render(req, 'kucun_fahuodanguanli.html', data)
+    else:
+        id = req.POST.get('id')
+        fahuo = Deliver.objects.get(id = id)
+        data={}
+        data['customer'] = fahuo.order.customer.customerName
+        data['receiver'] = fahuo.order.receiver
+        data['address'] = fahuo.order.receAddress
+        detail = DeliverDatail.objects.filter(deliver = fahuo)
+        fahuodetail =[]
+        for i in detail:
+            prodetail = {}
+            prodetail['product'] = i.product.productName
+            prodetail['num'] = i.deliverNum
+            fahuodetail.append(prodetail)
+        data['fahuodetail'] =fahuodetail
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
-#mkx-缺货单
-#采购管理-缺货单管理
-def caigou_quehuodanguanli(req):
+
+# 库存管理-再订货单管理
+@csrf_exempt
+def kucun_zaidinghuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
-        data={}
-        quehuodan = OutdemandDetail.objects.all()
-        quehuodanlist = []
+        data = {}
+        zaidinghuodan = Againpurchase.objects.all()
+        zaidinghuodanlist = []
+        for i in zaidinghuodan:
+            product = i.againpurchasenotice.product
+            supplier = i.supplier
+            detail = {}
+            detail['id'] = i.id
+            detail['user'] = i.user.userName
+            detail['num'] = i.againpurchasenotice.num
+            detail['product'] = product.productName
+            detail['supplier'] = supplier.supplierName
+            detail['price'] = ProducttoSupplier.objects.filter(product=product, supplier=supplier)[0].price
+            detail['status'] = i.status
+            detail['time'] = i.addTime
+            zaidinghuodanlist.append(detail)
+        data['zaidinghuodanlist'] = zaidinghuodanlist
+        data['username'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'kucun_base.html'
+        data['base_template'] = base_template
+        return render(req, 'kucun_zaidinghuodanguanli.html', data)
+    else:
+        id = req.POST.get('id')
+        status = req.POST.get('status')
+        if status == "已收货":
+            againpurchase  = Againpurchase.objects.get(id=id)
+            payable = Payable.objects.create(againpurchase = againpurchase, totalAccount = 0,invoiceStatus='未开', addTime =timezone.now(),status = '待付款')
+            product = againpurchase.againpurchasenotice.product
+            num =againpurchase.againpurchasenotice.num
+            supplier = againpurchase.supplier
+            unitprice = ProducttoSupplier.objects.filter(product=product,supplier = supplier)[0].price
+            total = num*unitprice
+            PayableDetail.objects.create(payable = payable, product = product,productName="11",unitPrice = unitprice, salsAmount = num,totalsales = total)
+            Againpurchase.objects.filter(id=id).update(status=status)
+            Payable.objects.filter(id = payable.id).update(totalAccount = total)
+            result = "post_success"
+            return HttpResponse(json.dumps(result), content_type='application/json')
 
-        for i in quehuodan:
-            quehuodandetail={}
-            quehuodandetail['id']= i.id
-            quehuodandetail['pid']= Product.objects.get(id=i.product_id).id
-            quehuodandetail['pname'] = Product.objects.get(id=i.product_id).productName
-            quehuodandetail['qnum'] = i.outNum
-            quehuodandetail['oid'] = OutDemand.objects.get(id=i.outDemand_id).order_id
-            quehuodandetail['time'] = OutDemand.objects.get(id=i.outDemand_id).addTime
-            quehuodandetail['user'] = OutDemand.objects.get(id=i.outDemand_id).user
-            quehuodandetail['state'] = OutDemand.objects.get(id=i.outDemand_id).status
-            quehuodanlist.append(quehuodandetail)
-        data['quehuodanlist'] = quehuodanlist
-        data['realname'] = username
+#采购管理-再订货通知单管理
+@csrf_exempt
+def caigou_againpurchasenotice(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data = {}
+        againpurchasenotice = Againpurchasenotice.objects.all().order_by("-addTime")
+        noticelist = []
+
+        for i in againpurchasenotice:
+            detail = {}
+            detail['id'] = i.id
+            detail['productname'] = i.product.productName
+            detail['productsize'] = i.product.productSize
+            detail['num'] = i.num
+            detail['time'] = i.addTime
+            detail['status'] = i.status
+            noticelist.append(detail)
+        data['againnotice'] = noticelist
+        data['username'] = username
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
             base_template = 'caigou_base.html'
         data['base_template'] = base_template
-        return render(req, 'caigou_quehuodanguanli.html', data)
+        return render(req, 'caigou_againpurchasenotice.html', data)
+    else:
+        id = req.POST.get('id')
+        data = {}
+        againnotice = Againpurchasenotice.objects.get(id =id)
+        product = againnotice.product
+        data['productname'] = product.productName
+        data['productsize'] = product.productSize
+        data['againnoticeid'] = id
+        baojia = ProducttoSupplier.objects.filter(product = product)
+        baojialist=[]
+        for i in baojia:
+            detail = {}
+            detail['supplierid'] = i.supplier.id
+            detail['supplier'] = i.supplier.supplierName
+            detail['credit'] = i.supplier.credit
+            detail['price'] = i.price
+            baojialist.append(detail)
+        data['baojialist']=baojialist
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+# 采购管理-再订货单管理
+@csrf_exempt
+def caigou_againpurchase(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data = {}
+        againpurchasenotice = Againpurchasenotice.objects.all().order_by("-addTime")
+        noticelist = []
+
+        for i in againpurchasenotice:
+            detail = {}
+            detail['id'] = i.id
+            detail['productname'] = i.product.productName
+            detail['productsize'] = i.product.productSize
+            detail['num'] = i.num
+            detail['time'] = i.addTime
+            detail['status'] = i.status
+            noticelist.append(detail)
+        data['againnotice'] = noticelist
+        data['username'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'caigou_base.html'
+        data['base_template'] = base_template
+        return render(req, 'caigou_againpurchasenotice.html', data)
+    else:
+        user_id = req.session['user_id']
+        user = User.objects.get(id = user_id)
+        supplierid = req.POST.get('supplierid')
+        againnoticeid = req.POST.get('againnoticeid')
+        supplier = Supplier.objects.get(id = supplierid)
+        againnotice = Againpurchasenotice.objects.get(id = againnoticeid)
+        Againpurchase.objects.create(user = user, supplier = supplier, againpurchasenotice = againnotice, addTime = timezone.now(),status = "待发货")
+        data = {}
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+#mkx-缺货单
+#采购管理-缺货单管理
+@csrf_exempt
+def kucun_quehuodanguanli(req):
+    if req.method == 'GET':
+        username = req.session['username']
+        data={}
+        quehuodan = OutDemand.objects.all()
+        quehuodanlist = []
+        for i in quehuodan:
+            quehuodandetail={}
+            quehuodandetail['id']= i.id
+            quehuodandetail['user']= i.user.userName
+            quehuodandetail['time'] =  i.addTime
+            quehuodandetail['status'] = i.status
+            quehuodandetail['customer'] = i.order.customer.customerName
+            quehuodanlist.append(quehuodandetail)
+        data['quehuodanlist'] = quehuodanlist
+        data['username'] = username
+        if User.objects.get(userName=username).userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'kucun_base.html'
+        data['base_template'] = base_template
+        return render(req, 'kucun_quehuodanguanli.html', data)
+    else:
+        data = {}
+        id = req.POST.get('id')
+        outDemand = OutDemand.objects.get(id = id)
+        outdemanddetail = OutdemandDetail.objects.filter(outDemand = outDemand).all()
+        outdetail = []
+        for i in outdemanddetail:
+            detail = {}
+            detail['productname'] = i.product.productName
+            detail['productsize'] = i.product.productSize
+            detail['num'] = i.outNum
+            outdetail.append(detail)
+        data['outdetail'] = outdetail
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+#缺货单校验
+@csrf_exempt
+def kucun_quehuodancheck(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        outDemand = OutDemand.objects.get(id=id)
+        outdemandDetail = OutdemandDetail.objects.filter(outDemand=outDemand).all()
+        tag = 1
+        for i in outdemandDetail:
+            kucun = i.product.stock
+            shuliang = i.outNum
+            if (kucun - shuliang) < 0:
+                tag = 0
+                break
+        data = {}
+        data['result'] = tag
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+# 缺货单发货
+@csrf_exempt
+def kucun_quehuodanfahuo(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        outDemand = OutDemand.objects.get(id=id)
+        userid = req.session['user_id']
+        order = outDemand.order
+        user = User.objects.get(id=userid)
+        Order.objects.filter(id=order.id).update(status="已发货")
+        deliver = Deliver.objects.create(order=order, user=user, addTime=timezone.now(), status="已发货")
+        outdemandDetail = OutdemandDetail.objects.filter(outDemand=outDemand).all()
+        for i in outdemandDetail:
+            stock = i.product.stock - i.outNum
+            Product.objects.filter(id=i.product.id).update(stock=stock)
+            DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.outNum)
+        OutDemand.objects.filter(id=outDemand.id).update(status = "已处理")
+
+        data = {}
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 #mkx-再订货单
 #采购管理-再订货单管理
@@ -552,28 +898,36 @@ def caigou_zaidinghuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        zaidinghuodan = AgainpurchaseDetail.objects.all()
+        zaidinghuodan = Againpurchase.objects.all()
         zaidinghuodanlist = []
-
         for i in zaidinghuodan:
-            zaidinghuodandetail={}
-            zaidinghuodandetail['id']= i.id
-            zaidinghuodandetail['pid']= Product.objects.get(id=i.product_id).id
-            zaidinghuodandetail['pname'] = Product.objects.get(id=i.product_id).productName
-            zaidinghuodandetail['pnum'] = i.purchaseNum
-            zaidinghuodandetail['apid'] = i.againpurchase_id #通知单编号
-            zaidinghuodandetail['time'] = Againpurchase.objects.get(id=i.againpurchase_id).addTime
-            zaidinghuodandetail['user'] = Againpurchase.objects.get(id=i.againpurchase_id).user
-            zaidinghuodandetail['state'] = Againpurchase.objects.get(id=i.againpurchase_id).status
-            zaidinghuodanlist.append(zaidinghuodandetail)
+            product = i.againpurchasenotice.product
+            supplier = i.supplier
+            detail={}
+            detail['id']= i.id
+            detail['user'] = i.user.userName
+            detail['num'] = i.againpurchasenotice.num
+            detail['product'] = product.productName
+            detail['supplier'] = supplier.supplierName
+            detail['price'] = ProducttoSupplier.objects.filter(product = product,supplier = supplier)[0].price
+            detail['status'] = i.status
+            detail['time'] = i.addTime
+            zaidinghuodanlist.append(detail)
         data['zaidinghuodanlist'] = zaidinghuodanlist
-        data['realname'] = username
+        data['username'] = username
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
             base_template = 'caigou_base.html'
         data['base_template'] = base_template
         return render(req, 'caigou_zaidinghuodanguanli.html', data)
+    else:
+        id = req.POST.get('id')
+        Againpurchase.objects.filter(id = id).delete()
+        data={}
+        data['result'] ="post_success"
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 #采购管理-供应商管理
 @csrf_exempt
@@ -610,7 +964,7 @@ def caigou_gongyingshangguanli(req):
         phone = req.POST.get('phone')
         email = req.POST.get('email')
         productscope = req.POST.get('productscope')
-        Supplier.objects.create(supplierName=suppliercompany, linkMan=linkman, address=address, phone=phone, email=email, productScope=productscope,user = user)
+        Supplier.objects.create(supplierName=suppliercompany, credit =100, linkMan=linkman, address=address, phone=phone, email=email, productScope=productscope,user = user)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
@@ -625,10 +979,136 @@ def caigou_suppliermodify(req):
         phone = req.POST.get('phone')
         email = req.POST.get('email')
         productscope = req.POST.get('productscope')
+        credit = req.POST.get('credit')
+
         id = req.POST.get('id')
-        Supplier.objects.filter(id=id).update(supplierName=suppliercompany, linkMan=linkman, address=address, phone=phone, email=email, productScope=productscope)
+        Supplier.objects.filter(id=id).update(supplierName=suppliercompany, linkMan=linkman, address=address, phone=phone, email=email, productScope=productscope,credit = credit)
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 采购管理-供应商信息详情
+@csrf_exempt
+def caigou_supplierdetail(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        supplier = Supplier.objects.get(id=id)
+        data = {}
+        data['id'] = supplier.id
+        data['supplierName'] = supplier.supplierName
+        data['linkMan'] = supplier.linkMan
+        data['address'] = supplier.address
+        data['phone'] = supplier.phone
+        data['email'] = supplier.email
+        data['productScope'] = supplier.productScope
+        data['credit'] = supplier.credit
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+# 采购管理-供应商 再订货单
+@csrf_exempt
+def supplier_zaidinghuo(req):
+    if req.method == 'GET':
+        user_id = req.session['user_id']
+        username = req.session['username']
+        user = User.objects.get(id = user_id)
+        supplier = Supplier.objects.filter(user = user)[0]
+        data = {}
+        againpurchase = Againpurchase.objects.filter(supplier = supplier).all()
+        againlist = []
+        for i in againpurchase:
+            detail ={}
+            product = i.againpurchasenotice.product
+            supplier = i.supplier
+            detail['id'] = i.id
+            detail['user'] = i.user.userName
+            detail['num'] = i.againpurchasenotice.num
+            detail['product'] = product.productName
+            detail['supplier'] = supplier.supplierName
+            detail['price'] = ProducttoSupplier.objects.filter(product=product, supplier=supplier)[0].price
+            detail['status'] = i.status
+            detail['time'] = i.addTime
+            againlist.append(detail)
+        data['zaidinghuodanlist'] = againlist
+        data['username'] = username
+        data['base_template'] = 'supplier_base.html'
+        return  render(req, 'supplier_zaidinghuodanguanli.html', data)
+    else:
+        id = req.POST.get('id')
+        Againpurchase.objects.filter(id = id).update(status = "已发货")
+        result = "post_success"
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 供应商报价 详情
+@csrf_exempt
+def bjmanage(req):
+    if req.method == 'GET':
+        data = {}
+        id = req.session['user_id']
+        username = req.session['username']
+        user = User.objects.get(id=id)
+        if user.userRole.id ==7:
+            supplier = Supplier.objects.get(user = user)
+        else:
+            supplier_id = req.GET.get("id")
+            supplier = Supplier.objects.get(id = supplier_id)
+
+        protopri=ProducttoSupplier.objects.filter(supplier=supplier)
+        suptoprodetail = []
+        for i in protopri:
+            detail = {}
+            detail['id'] = i.id
+            detail['productname'] = i.product.productName
+            detail['productsize'] = i.product.productSize
+            detail['price'] = i.price
+            suptoprodetail.append(detail)
+        product = Product.objects.all()
+        productlist = []
+
+        for k in product:
+            productlist.append(k.productName)
+        data['productlist'] = productlist
+        if user.userRole_id == 1:
+            base_template = 'admin_base.html'
+        elif user.userRole_id == 5:
+            base_template = 'caigou_base.html'
+        else:
+            base_template = 'supplier_base.html'
+        data['base_template'] = base_template
+        data['protosup'] = suptoprodetail
+        data['user_id']=supplier.id
+        data['username'] = username
+        return  render(req, 'supplier_bj.html', data)
+    else:
+        id = req.POST.get('id')
+        supplier = Supplier.objects.get(id = id)
+        productname = req.POST.get('product')
+        price = float(req.POST.get('price'))
+        product = Product.objects.filter(productName=productname)[0]
+        ProducttoSupplier.objects.create(supplier = supplier,product=product, price=price)
+        result = 'post_success'
+        return HttpResponse(json.dumps(result), content_type='application/json')
+
+# 销售管理-删除订单
+@csrf_exempt
+def bjdel(req):
+    if req.method == "POST":
+        id = req.POST.get('id')
+        ProducttoSupplier.objects.get(id=id).delete()
+        data={}
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+# 销售管理-删除订单
+@csrf_exempt
+def bjmod(req):
+    if req.method == "POST":
+        id = req.POST.get('id')
+        price=req.POST.get('price')
+        ProducttoSupplier.objects.filter(id=id).update(price = price)
+        data = {}
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 # 采购管理_供应商删除
 @csrf_exempt
@@ -645,56 +1125,105 @@ def caigou_supplierdel(req):
 
 
 #财务-应付账款管理
+@csrf_exempt
 def caiwu_yingfuzhangfuanli(req):
     if req.method == 'GET':
         username = req.session['username']
+        user_id = req.session['user_id']
         data={}
-        yingfuzhang = Payable.objects.all()
+        yingfuzhang = Payable.objects.all().order_by('-addTime')
         yingfuzhanglist = []
-
         for i in yingfuzhang:
             yingfuzhangdetail={}
             yingfuzhangdetail['id']= i.id
-            yingfuzhangdetail['cgid'] = Purchase.objects.get(id=i.purchase_id).id
             yingfuzhangdetail['time'] = i.addTime
-            yingfuzhangdetail['paystatus']= i.status
-            yingfuzhangdetail['invoicestatus'] = i.invoiceStatus
+            yingfuzhangdetail['status']= i.status
+            yingfuzhangdetail['supplier'] = i.againpurchase.supplier.supplierName
             yingfuzhangdetail['total'] = i.totalAccount
             yingfuzhanglist.append(yingfuzhangdetail)
         data['yingfuzhanglist'] = yingfuzhanglist
-        data['realname'] = username
-        if User.objects.get(userName=username).userRole_id == 1:
+        data['username'] = username
+        if User.objects.get(id = user_id).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
             base_template = 'caiwu_base.html'
         data['base_template'] = base_template
         return render(req, 'caiwu_yingfuzhangfuanli.html', data)
+    else:
+        id = req.POST.get('id')
+        data = {}
+        paylist = []
+        pay = Payable.objects.get(id = id)
+        paydetail = PayableDetail.objects.filter(payable = pay)
+        for i in paydetail:
+            detail = {}
+            detail['product'] = i.product.productName
+            detail['unitprice'] = i.unitPrice
+            detail['salsAmount'] = i.salsAmount
+            detail['totalsales'] = i.totalsales
+            paylist.append(detail)
+        data['paylist'] = paylist
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+#应付账款-支付
+@csrf_exempt
+def caiwu_zhifu(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        data = {}
+        paylist = []
+        pay = Payable.objects.get(id=id)
+        Payable.objects.filter(id = id).update(status = '已支付')
+        Purchase_account.objects.create(payable = pay,addTime = timezone.now(), totalAccount = pay.totalAccount)
+        data['result'] = 'post_success'
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 #mkx-应收帐
 #财务管理-应收账款管理
+@csrf_exempt
 def caiwu_yingshouzhangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        yingshouzhang = Receivable.objects.all()
+        yingshouzhang = Receivable.objects.all().order_by('-addTime')
         yingshouzhanglist = []
-
         for i in yingshouzhang:
             yingshouzhangdetail={}
             yingshouzhangdetail['id']= i.id
-            yingshouzhangdetail['bhid'] = Stocknotice.objects.get(id=i.stocknotice_id).id
+            yingshouzhangdetail['customer']= i.Deliver.order.customer.customerName
+            yingshouzhangdetail['sum']= i.totalAccount
             yingshouzhangdetail['time'] = i.addTime
             yingshouzhangdetail['status'] = i.status
-            yingshouzhangdetail['total'] = i.totalAccount
             yingshouzhanglist.append(yingshouzhangdetail)
         data['yingshouzhanglist'] = yingshouzhanglist
-        data['realname'] = username
+        data['username'] = username
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
             base_template = 'caiwu_base.html'
         data['base_template'] = base_template
         return render(req, 'caiwu_yingshouzhangguanli.html', data)
+    else:
+        id = req.POST.get('id')
+        data = {}
+        paylist = []
+        pay = Receivable.objects.get(id = id)
+        paydetail = ReceivableDetail.objects.filter(receivable = pay)
+        for i in paydetail:
+            detail = {}
+            detail['product'] = i.product.productName
+            detail['unitprice'] = i.unitPrice
+            detail['salsAmount'] = i.salsAmount
+            detail['totalsales'] = i.totalsales
+            paylist.append(detail)
+        data['paylist'] = paylist
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 
 #mkx-销售帐
 #财务管理-销售账款管理
@@ -702,18 +1231,18 @@ def caiwu_xiaoshouzhangguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        xiaoshouzhang = SaleAccount.objects.all()
-        xiaoshouzhanglist = []
+        xiaoshouzhang = SaleAccount.objects.all().order_by('-addTime')
 
+        xiaoshouzhanglist = []
         for i in xiaoshouzhang:
             xiaoshouzhangdetail={}
             xiaoshouzhangdetail['id']= i.id
-            xiaoshouzhangdetail['rcid'] = Receivable.objects.get(id=i.receivable_id).id
+            xiaoshouzhangdetail['customer']= i.receivable.Deliver.order.customer.customerName
             xiaoshouzhangdetail['time'] = i.addTime
             xiaoshouzhangdetail['total'] = i.totalAccount
             xiaoshouzhanglist.append(xiaoshouzhangdetail)
         data['xiaoshouzhanglist'] = xiaoshouzhanglist
-        data['realname'] = username
+        data['username'] = username
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
@@ -733,12 +1262,12 @@ def caiwu_caigouzhangguanli(req):
         for i in caigouzhang:
             caigouzhangdetail={}
             caigouzhangdetail['id']= i.id
-            caigouzhangdetail['pbid'] = Payable.objects.get(id=i.payable_id).id
+            caigouzhangdetail['supplier'] = i.payable.againpurchase.supplier.supplierName
             caigouzhangdetail['time'] = i.addTime
             caigouzhangdetail['total'] = i.totalAccount
             caigouzhanglist.append(caigouzhangdetail)
         data['caigouzhanglist'] = caigouzhanglist
-        data['realname'] = username
+        data['username'] = username
         if User.objects.get(userName=username).userRole_id == 1:
             base_template = 'admin_base.html'
         else:
@@ -752,3 +1281,69 @@ def lockscreen(req):
     username = req.session['username']
     data['username']=username
     return render(req, 'lockscreen.html', data)
+
+#主页
+def zhuye(req):
+    data = {}
+    username = req.session['username']
+    user_id = req.session['user_id']
+    user = User.objects.get(id =user_id)
+    data['username'] = username
+    userRoleid = user.userRole.id
+    today = datetime.date.today()
+    daylist = []
+    conutlist = []
+    purchasepricelist = []
+    paylist = []
+    for i in range(0, 7):
+        temp = 0
+        temp2 = 0
+        oneday = datetime.timedelta(days=i)
+        yesterday = today - oneday
+        year = yesterday.year
+        month = yesterday.month
+        day = yesterday.day
+        purprice = Purchase_account.objects.filter(addTime__year=year, addTime__month=month,
+                                                   addTime__day=day).aggregate(Sum('totalAccount'))
+        pay = SaleAccount.objects.filter(addTime__year=year, addTime__month=month, addTime__day=day).aggregate(
+            Sum('totalAccount'))
+        count = Order.objects.filter(orderTime__year=year, orderTime__month=month, orderTime__day=day).count()
+        ayesterday = yesterday.strftime("%Y-%m-%d")
+        conutlist.append(count)
+        if purprice.values()[0] == None:
+            temp = 0
+        else:
+            temp = purprice.values()[0]
+        if pay.values()[0] == None:
+            temp2 = 0
+        else:
+            temp2 = pay.values()[0]
+        purchasepricelist.append(temp)
+        paylist.append(temp2)
+        daylist.append(ayesterday)
+    data['daylist'] = daylist
+    data['countlist'] = conutlist
+    data['paylist'] = paylist
+    data['purchasepricelist'] = purchasepricelist
+
+    if userRoleid == 1:
+        return render(req, 'admin_base.html', data)
+    elif userRoleid ==2:
+        return render(req, 'sales_base.html', data)
+    elif userRoleid == 3:
+        return render(req, 'kucun_base.html', data)
+    elif userRoleid == 4:
+        return render(req, 'caiwu_base.html', data)
+    elif userRoleid == 5:
+        return render(req, 'caigou_base.html', data)
+    elif userRoleid == 6:
+        return render(req, 'customer_base.html', data)
+    elif userRoleid == 7:
+        return render(req, 'supplier_base.html', data)
+    else:
+        return render(req, 'login.html', {})
+
+#注册
+def signup(req):
+    if req.method == 'GET':
+        return  render(req,'signup.html',{})

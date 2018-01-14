@@ -1,0 +1,217 @@
+{% extends base_template %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+            库存管理>缺货单管理
+             <span class="smart-widget-option">
+                <span class="refresh-icon-animated">
+                    <i class="fa fa-circle-o-notch fa-spin"></i>
+                </span>
+                <a href="#" class="widget-toggle-hidden-option">
+                    <i class="fa fa-cog"></i>
+                </a>
+                <a href="#" class="widget-collapse-option" data-toggle="collapse">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a href="#" class="widget-refresh-option">
+                    <i class="fa fa-refresh"></i>
+                </a>
+                <a href="#" class="widget-remove-option">
+                    <i class="fa fa-times"></i>
+                </a>
+            </span>
+        </div>
+        <div class="smart-widget-inner">
+            <div class="smart-widget-hidden-section">
+                <ul class="widget-color-list clearfix">
+                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
+                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
+					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
+					<li style="background-color:#2baab1;" data-color="widget-green"></li>
+					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
+					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
+					<li style="background-color:#e36159;" data-color="widget-red"></li>
+					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
+					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
+					<li style="background-color:#fff;" data-color="reset"></li>
+                </ul>
+            </div>
+            <div class="smart-widget-body">
+             <!-- detail -->
+            <div class="modal fade" id="orderdetail">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">缺货单详情</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table id="orderdetailtable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>产品名称</th>
+                                        <th>产品型号</th>
+                                        <th>缺货数量</th>
+                                    </tr>
+                                </thead>
+                                <tbody id = "orderdetailbody">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                  <!-- shenhetongguo -->
+            <div class="modal fade" id="shenhetongguo">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">缺货单库存审核结果</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input id="shenhesuccess" type="hidden">
+                            <div class="font-18 font-semi-bold">
+                                库存充足
+                            </div>
+                            <iframe id="id_iframe" name="id_iframe" style="display: none;">
+                            </iframe>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="successfahuo" type="button" class="btn btn-success">发货</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- shenheshibai-->
+            <div class="modal fade" id="shenheshibai">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">缺货单库存审核结果</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input id="shenheunsuccess" type="hidden">
+                            <div class="font-18 font-semi-bold">
+                                仍缺货
+                            </div>
+                            <iframe id="id_iframe" name="id_iframe" style="display: none;">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>添加人</th>
+                        <th>状态</th>
+                        <th>客户名称</th>
+                        <th>时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in quehuodanlist %}
+                        <tr id="{{ i.id }}">
+                            <td>{{ i.id }}</td>
+                            <td>{{ i.user }}</td>
+                            <td>{{ i.status }}</td>
+                            <td>{{ i.customer }}</td>
+                            <td>{{ i.time|date:"Y-m-d" }}</td>
+                            <td>
+                                <button class="btn btn-info btn-xs detail">详情</button>
+                                <button class="btn btn-info btn-xs check">校验</button>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+            $(".modal").draggable();
+
+     $('.detail').on('click',function () {
+        var id = $(this).parents("tr").attr("id");
+        $.ajax({
+            url: '/pools/kucun_quehuodanguanli',
+            type: 'POST',
+            data: {id: id},
+            dataType: 'json',
+            timeout: 10000,
+            success: function (data) {
+                if (data.result == "post_success") {
+                    var detail = data.outdetail;
+                    $('#orderdetailbody').html("");
+                    var str = "";
+                    for (i in detail){
+                        str+="<tr><td>"+ detail[i].productname+"</td><td>"+detail[i].productsize+"</td><td>"+detail[i].num+"</td></tr>"
+                    }
+                    $('#orderdetailbody').append(str);
+                    $("#orderdetail").modal()
+
+
+                } else {
+                    alert('操作未成功');
+                }
+            }
+        })
+
+    });
+     $('.check').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                url: '/pools/kucun_quehuodancheck',
+                type: 'POST',
+                data: {'id': id},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (data) {
+                    if (data.result == 1) {
+                        $("#shenhesuccess").val(data.id);
+                        $("#shenhetongguo").modal()
+                    } else if(data.result ==0){
+                        $("#shenheunsuccess").val(data.id);
+                        $("#shenheshibai").modal()
+                    }else{
+                        alert('操作未成功');
+                    }
+                }
+            });
+        });
+     $('#successfahuo').on('click',function () {
+            var id = $('#shenhesuccess').val();
+            $.ajax({
+                url: '/pools/kucun_quehuodanfahuo',
+                type: 'POST',
+                data: {'id': id},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (data) {
+                    if (data.result =='post_success') {
+                        window.location.reload();
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

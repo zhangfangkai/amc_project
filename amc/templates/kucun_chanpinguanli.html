@@ -119,7 +119,41 @@
 		    	</div>
 		  	</div>
 		</div>
-
+        <!-- purchasenoti-->
+		<div class="modal fade" id="purchasenoti" aria-hidden="true">
+		  	<div class="modal-dialog modal-sm">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        		<h4 class="modal-title" id="myModalLabel">开订货通知单</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<form   method="post" role="form" class="form-horizontal">
+                            <input id="productid" type="hidden">
+				  			<div class="form-group">
+				    			<label class="control-label col-sm-3" for="productname">产品名称</label>
+                                <div class="col-sm-8">
+                                    <label class="control-label "  style="font-weight: lighter" id="productnamenoti">产品名称</label>
+                                </div>
+				  			</div>
+                            <div class="form-group">
+							    <label class="control-label col-sm-3" for="productsize">产品规格</label>
+                                 <div class="col-sm-8">
+                                     <label class="control-label" style="font-weight: lighter" id="productsizenoti">产品规格</label>
+                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3" for="stock">数量</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" id="numnoti" placeholder="请输入数量">
+                                </div>
+				  			</div>
+		        		</form>
+                        <a id='ordernotiok'class="btn btn-danger block m-top-md">确认</a>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
 
         <div class="smart-widget-inner">
             <div class="smart-widget-hidden-section">
@@ -161,6 +195,7 @@
                             <td>
                             <button class="btn btn-info btn-xs xiugai">修改</button>
                             <button class="btn btn-info btn-xs del">删除</button>
+                                <button class="btn btn-info btn-xs ordernotify">订货通知</button>
 
                             </td>
                         </tr>
@@ -185,6 +220,8 @@
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
      <script type="text/javascript">
+         $(".modal").draggable();
+
          $(document).ready(function(){
              $('#productformbody').find('tr').each(function () {
                  stock = $(this).children('td').eq(3).html();
@@ -246,7 +283,7 @@
             var productsize = tr.children("td").eq(2).text();
             var stock = tr.children("td").eq(3).text();
             var safestock = tr.children("td").eq(4).text();
-            var salesprice = tr.children("td").eq(6).text();
+            var salesprice = tr.children("td").eq(5).text();
 
             $('#modproductname').val(productname);
             $('#modproductsize').val(productsize);
@@ -270,12 +307,8 @@
                 $("#modstock").focus();
             }else if(safestock=='') {
                 $("#modsafestock").focus();
-            }else if(purchaseprice==''){
-                $("#modpurchaseprice").focus();
             }else if(salesprice==''){
                 $("#modsalesprice").focus();
-            }else if(supplierid==''){
-                $("#modsupplierid").focus();
             }else{
                             console.log("keyile");
 
@@ -285,9 +318,7 @@
                 data['productsize']=productsize;
                 data['stock']=stock;
                 data['safestock']=safestock;
-                data['purchaseprice']=purchaseprice;
                 data['salesprice']=salesprice;
-                data['supplierid']=supplierid;
                 $.ajax({
                     url: '/pools/kucun_productmodify',
                     type: 'POST',
@@ -325,7 +356,43 @@
                 });
             }
 
-        })
+        });
+
+
+     $('.ordernotify').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $('#productid').val(id);
+            var productname = tr.children('td').eq(1).text();
+            var productsize = tr.children('td').eq(2).text();
+            console.log(productname,productsize);
+            $('#productnamenoti').html(productname);
+            $('#productsizenoti').html(productsize);
+            $('#purchasenoti').modal();
+     });
+         $('#ordernotiok').on('click',function () {
+             var id = $('#productid').val();
+             var num = $('#numnoti').val();
+             var data={};
+             data['id'] = id;
+             data['num'] = num;
+              $.ajax({
+                    url: '/pools/kucun_againpurchasenotice',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (result) {
+                        if (result == "post_success") {
+                            $('#purchasenoti').modal('hide');
+                            alert('添加成功');
+                        } else {
+                            alert('删除未成功');
+                        }
+                    }
+                });
+
+     });
 
 </script>
 {% endblock %}

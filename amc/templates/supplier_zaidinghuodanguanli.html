@@ -2,7 +2,7 @@
 {% block miancontainer %}
     <div class="smart-widget">
         <div class="smart-widget-header">
-            库存管理>进货单管理
+            供应商>再订货单管理
              <span class="smart-widget-option">
                 <span class="refresh-icon-animated">
                     <i class="fa fa-circle-o-notch fa-spin"></i>
@@ -40,31 +40,28 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>进货单通知单编号</th>
-                        <th>产品编号</th>
-                        <th>产品名称</th>
-                        <th>进货数量</th>
+                        <th>编号</th>
+                        <th>产品</th>
+                        <th>供应商</th>
+                        <th>数量</th>
+                        <th>单价</th>
+                        <th>状态</th>
                         <th>添加时间</th>
-                        <th>进货单通知单状态</th>
                         <th>操作</th>
-
                     </tr>
                     </thead>
                     <tbody>
-                    {% for i in jinhuodanlist %}
+                    {% for i in zaidinghuodanlist %}
                         <tr id="{{ i.id }}">
                             <td>{{ i.id }}</td>
-                            <td>{{ i.pid }}</td>
-                            <td>{{ i.productname }}</td>
-                            <td>{{ i.number }}</td>
-                            <td>{{ i.time }}</td>
-                            <td>{{ i.state }}</td>
-
-{#                            <td>{{ i.wjtime|date:"Y-m-d H:i:s"  }}</td>#}
-{#                            <td>发布/未发布</td>#}
+                            <td>{{ i.product }}</td>
+                            <td>{{ i.supplier}}</td>
+                            <td>{{ i.num }}</td>
+                            <td>{{ i.price }}</td>
+                            <td>{{ i.time|date:"Y-m-d" }}</td>
+                            <td>{{ i.status }}</td>
                             <td>
-                            <button class="btn btn-info btn-xs zhifu">修改通知单状态</button>
-
+                                <button class="btn btn-info btn-xs fahuo">发货</button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -87,29 +84,29 @@
     </div><!-- /wrapper -->
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
-     <script type="text/javascript">
-     $('.zhifu').on('click',function () {
+    <script type="text/javascript">
+            $(".modal").draggable();
 
-                var tr = $(this).parents("tr")
-                var id = tr.attr("id")
-                $.ajax({
-                    url: '/pools/sales_orderzhifu',
-                    type: 'POST',
-                    data: {orderid: id},
-                    dataType: 'json',
-                    timeout: 10000,
-                    success: function (result) {
-                        if (result.result == "post_success") {
-    window.location.reload();
+    $('.fahuo').on('click',function () {
+        var sta = $(this).parent().prev().get(0);
+        var tr = $(this).parents("tr");
+        var id = tr.attr("id");
+        $.ajax({
+            url: '/pools/supplier_zaidinghuo',
+            type: 'POST',
+            data: {id: id},
+            dataType: 'json',
+            timeout: 10000,
+            success: function (result) {
+                if (result == "post_success") {
+                    sta.innerHTML = "已发货";
+                } else {
+                    alert('删除未成功');
+                }
+            }
+        });
 
-                        } else {
-                            alert('修改未成功');
-                        }
-                    }
-                });
-
-
-        })
-     </script>
+    })
+    </script>
 
 {% endblock %}

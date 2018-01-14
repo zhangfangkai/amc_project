@@ -1,0 +1,194 @@
+{% extends base_template %}
+{% block miancontainer %}
+    <div class="smart-widget">
+        <div class="smart-widget-header">
+            采购管理>再订货通知单管理
+             <span class="smart-widget-option">
+                <span class="refresh-icon-animated">
+                    <i class="fa fa-circle-o-notch fa-spin"></i>
+                </span>
+                <a href="#" class="widget-toggle-hidden-option">
+                    <i class="fa fa-cog"></i>
+                </a>
+                <a href="#" class="widget-collapse-option" data-toggle="collapse">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a href="#" class="widget-refresh-option">
+                    <i class="fa fa-refresh"></i>
+                </a>
+                <a href="#" class="widget-remove-option">
+                    <i class="fa fa-times"></i>
+                </a>
+            </span>
+        </div>
+        <div class="smart-widget-inner">
+            <div class="smart-widget-hidden-section">
+                <ul class="widget-color-list clearfix">
+                    <li style="background-color:#20232b;" data-color="widget-dark"></li>
+                    <li style="background-color:#4c5f70;" data-color="widget-dark-blue"></li>
+					<li style="background-color:#23b7e5;" data-color="widget-blue"></li>
+					<li style="background-color:#2baab1;" data-color="widget-green"></li>
+					<li style="background-color:#edbc6c;" data-color="widget-yellow"></li>
+					<li style="background-color:#fbc852;" data-color="widget-orange"></li>
+					<li style="background-color:#e36159;" data-color="widget-red"></li>
+					<li style="background-color:#7266ba;" data-color="widget-purple"></li>
+					<li style="background-color:#f5f5f5;" data-color="widget-light-grey"></li>
+					<li style="background-color:#fff;" data-color="reset"></li>
+                </ul>
+            </div>
+            <div class="smart-widget-body">
+                <div class="modal fade" id="bjmanage" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">生成再订货单</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form  method="post" role="form" class="form-horizontal">
+                                <input id="againnoticeid" type="hidden">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3" for="suppliername">产品名称</label>
+                                    <div class="col-sm-8" >
+                                        <label class="control-label" style="font-weight: lighter" id="aproductname" ></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3" for="linkman">产品型号</label>
+                                     <div class="col-sm-8">
+                                         <label class="control-label" style="font-weight: lighter" id="aproductsize" ></label>
+                                     </div>
+                                </div>
+                                <hr/>
+                                <table id="sutopromodi" class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>选择</th>
+                                            <th>供应商</th>
+                                            <th>报价</th>
+                                            <th>信用</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id = "sutopromodibody">
+
+                                    </tbody>
+                             </table>
+		        		</form>
+                             <a id='affirm'class="btn btn-danger block m-top-md">确认</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>产品名称</th>
+                        <th>产品型号</th>
+                        <th>添加时间</th>
+                        <th>数量</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in againnotice %}
+                        <tr id="{{ i.id }}">
+                            <td>{{ i.id }}</td>
+                            <td>{{ i.productname }}</td>
+                            <td>{{ i.productsize }}</td>
+                            <td>{{ i.time|date:"Y-m-d" }}</td>
+                            <td>{{ i.num }}</td>
+                            <td>{{ i.status }}</td>
+                            <td>
+                                <button class="btn btn-info btn-xs dinghuo">下再订货单</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- ./smart-widget-inner -->
+    </div><!-- ./smart-widget -->
+
+
+
+    <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
+    <script type="text/javascript">
+        $(".modal").draggable();
+
+        $('.dinghuo').on('click',function () {
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            $.ajax({
+                url: '/pools/caigou_againpurchasenotice',
+                type: 'POST',
+                data: {id: id},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (data) {
+                    if (data.result == "post_success") {
+                        $('#aproductname').html(data.productname);
+                        $('#aproductsize').html(data.productsize);
+                        $('#againnoticeid').val(data.againnoticeid);
+                        var detail = data.baojialist;
+                        $('#sutopromodibody').html("");
+                        var str = "";
+                        for (i in detail){
+                          str +="<tr id='"+detail[i].supplierid+"'><td><input class='radiobox' type='radio'></td><td>"+detail[i].supplier+"</td><td>"
+                          +detail[i].price+"</td><td>"+detail[i].credit+"</td></tr>"
+                        }
+                        console.log(str);
+                        $('#sutopromodibody').append(str);
+                        $("#bjmanage").modal()
+
+                    } else {
+                        alert('操作未成功');
+                    }
+                }
+            });
+        });
+         $('#sutopromodi').delegate('.radiobox','click',function(){
+               var radio = $(this);
+             // if this was previously checked
+               if (radio.data('waschecked') == true){
+                   radio.prop('checked', false);
+                   radio.data('waschecked', false);
+               } else {
+                   radio.prop('checked', true);
+                   radio.data('waschecked', true);
+               }
+         });
+        $('#affirm').on('click',function () {
+            var val=$('input:radio[class="radiobox"]:checked').val();
+            if(val==null){
+                alert("请选中一个！");
+            }else{
+                var supplierid = $('input:radio[class="radiobox"]:checked').parents('tr').attr('id');
+                var againnoticeid = $('#againnoticeid').val();
+                var data = {};
+                data['supplierid'] = supplierid;
+                data['againnoticeid'] = againnoticeid;
+                 $.ajax({
+                    url: '/pools/caigou_againpurchase',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    timeout: 10000,
+                    success: function (data) {
+                        if (data.result == "post_success") {
+                          $("#bjmanage").modal('hide')
+                           alert('添加成功!')
+                        }else {
+                        alert('操作未成功');
+                        }
+
+                    }
+                });
+
+            }
+        });
+     </script>
+
+{% endblock %}
