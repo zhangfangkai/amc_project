@@ -114,7 +114,7 @@
              timeout: 10000,
              success: function (result) {
                  if (result.result == "post_success") {
-                     var detail = result.detail;
+                     var detail = result.paylist;
                     $('#orderdetailbody').html("");
                     var str = "";
                     for (i in detail){

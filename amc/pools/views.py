@@ -288,10 +288,28 @@ def customer_delivermanage(req):
     else:
         orderid = req.POST.get('orderid')
         status = req.POST.get('status')
-        if status == "已收货" or status == "已付款":
+
+        if status =="已收货":
+            deliver = Deliver.objects.get(id = orderid)
             Deliver.objects.filter(id=orderid).update(status=status)
-            result = "post_success"
-            return HttpResponse(json.dumps(result), content_type='application/json')
+            receivable = Receivable.objects.create(Deliver = deliver,addTime = timezone.now(),status = "待付款",totalAccount = 0)
+            deliverDatail = DeliverDatail.objects.filter(deliver=deliver).all()
+            tempnum = 0
+            for i in deliverDatail:
+                product = i.product
+                num = i.deliverNum
+                total = product.saleprice*num
+                ReceivableDetail.objects.create(receivable = receivable,product = product,unitPrice = product.saleprice,salsAmount = num,totalsales = total)
+                tempnum += total
+            Receivable.objects.filter(id = receivable.id).update(totalAccount = tempnum)
+        elif status == "已付款":
+            deliver = Deliver.objects.get(id = orderid)
+            Deliver.objects.filter(id=orderid).update(status=status)
+            receivable = Receivable.objects.get(Deliver = deliver)
+            SaleAccount.objects.create(receivable = receivable,addTime = timezone.now(),totalAccount = receivable.totalAccount)
+            Receivable.objects.filter(Deliver=deliver).update(status = status)
+        result = "post_success"
+        return HttpResponse(json.dumps(result), content_type='application/json')
 
 
 # 客户-增加订单
