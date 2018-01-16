@@ -12,6 +12,7 @@ import json
 from django.db.models import Sum
 from django.utils import timezone
 import datetime
+import math
 
 
 
@@ -195,8 +196,11 @@ def sales_ordermanage(req):
         orderid=req.POST.get('orderid')
         status = req.POST.get('status')
         if status == "已审核" or status == "已打回":
-            Order.objects.filter(id=orderid).update(status=status)
-            result = "post_success"
+            if Order.objects.get(id=orderid).status == "待审核":
+                Order.objects.filter(id=orderid).update(status=status)
+                result = "post_success"
+            else:
+                result = "0"
             return HttpResponse(json.dumps(result), content_type='application/json')
         elif status == "发货":
             order = Order.objects.filter(id=orderid)
@@ -288,27 +292,30 @@ def customer_delivermanage(req):
     else:
         orderid = req.POST.get('orderid')
         status = req.POST.get('status')
-
+        result = '0'
         if status =="已收货":
-            deliver = Deliver.objects.get(id = orderid)
-            Deliver.objects.filter(id=orderid).update(status=status)
-            receivable = Receivable.objects.create(Deliver = deliver,addTime = timezone.now(),status = "待付款",totalAccount = 0)
-            deliverDatail = DeliverDatail.objects.filter(deliver=deliver).all()
-            tempnum = 0
-            for i in deliverDatail:
-                product = i.product
-                num = i.deliverNum
-                total = product.saleprice*num
-                ReceivableDetail.objects.create(receivable = receivable,product = product,unitPrice = product.saleprice,salsAmount = num,totalsales = total)
-                tempnum += total
-            Receivable.objects.filter(id = receivable.id).update(totalAccount = tempnum)
+            if Deliver.objects.get(id = orderid).status == '已发货':
+                deliver = Deliver.objects.get(id = orderid)
+                Deliver.objects.filter(id=orderid).update(status=status)
+                receivable = Receivable.objects.create(Deliver = deliver,addTime = timezone.now(),status = "待付款",totalAccount = 0)
+                deliverDatail = DeliverDatail.objects.filter(deliver=deliver).all()
+                tempnum = 0
+                for i in deliverDatail:
+                    product = i.product
+                    num = i.deliverNum
+                    total = product.saleprice*num
+                    ReceivableDetail.objects.create(receivable = receivable,product = product,unitPrice = product.saleprice,salsAmount = num,totalsales = total)
+                    tempnum += total
+                Receivable.objects.filter(id = receivable.id).update(totalAccount = tempnum)
+                result = "post_success"
         elif status == "已付款":
-            deliver = Deliver.objects.get(id = orderid)
-            Deliver.objects.filter(id=orderid).update(status=status)
-            receivable = Receivable.objects.get(Deliver = deliver)
-            SaleAccount.objects.create(receivable = receivable,addTime = timezone.now(),totalAccount = receivable.totalAccount)
-            Receivable.objects.filter(Deliver=deliver).update(status = status)
-        result = "post_success"
+            if Deliver.objects.get(id=orderid).status == '已收货':
+                deliver = Deliver.objects.get(id = orderid)
+                Deliver.objects.filter(id=orderid).update(status=status)
+                receivable = Receivable.objects.get(Deliver = deliver)
+                SaleAccount.objects.create(receivable = receivable,addTime = timezone.now(),totalAccount = receivable.totalAccount)
+                Receivable.objects.filter(Deliver=deliver).update(status = status)
+                result = "post_success"
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 
@@ -347,15 +354,18 @@ def sales_successfahuo(req):
         userid = req.session['user_id']
         order = Order.objects.get(id=order_id)
         user = User.objects.get(id = userid)
-        Order.objects.filter(id = order_id).update(status = "已发货")
-        deliver=Deliver.objects.create(order = order,user = user,addTime = timezone.now(),status = "已发货")
-        orderdetail = order.order_detail_set.all()
-        for i in orderdetail:
-            stock = i.product.stock-i.orderNum
-            Product.objects.filter(id = i.product.id).update(stock = stock)
-            DeliverDatail.objects.create(deliver = deliver,product = i.product,deliverNum = i.orderNum)
+        result = '0'
+        if  Order.objects.get(id = order_id).status == "已审核":
+            Order.objects.filter(id = order_id).update(status = "已发货")
+            deliver=Deliver.objects.create(order = order,user = user,addTime = timezone.now(),status = "已发货")
+            orderdetail = order.order_detail_set.all()
+            for i in orderdetail:
+                stock = i.product.stock-i.orderNum
+                Product.objects.filter(id = i.product.id).update(stock = stock)
+                DeliverDatail.objects.create(deliver = deliver,product = i.product,deliverNum = i.orderNum)
+            result = 'post_success'
         data = {}
-        data['result'] = 'post_success'
+        data['result'] = result
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 # 销售管理-部分发货开缺货单
@@ -366,24 +376,27 @@ def sales_unsuccessfahuo(req):
         userid = req.session['user_id']
         order = Order.objects.get(id=order_id)
         user = User.objects.get(id=userid)
-        Order.objects.filter(id = order_id).update(status="部分发货")
-        deliver = Deliver.objects.create(order=order, user=user, addTime=timezone.now(), status="已发货")
-        outdemand = OutDemand.objects.create(order = order,user = user,addTime = timezone.now(),status ="缺货")
-        orderdetail = order.order_detail_set.all()
-        for i in orderdetail:
-            stock = i.product.stock
-            res = i.product.stock - i.orderNum
-            if stock == 0:
-                OutdemandDetail.objects.create(outDemand = outdemand,product = i.product,outNum = (0-res))
-            elif res >= 0:
-                Product.objects.filter(id=i.product.id).update(stock=res)
-                DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.orderNum)
-            else:
-                DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.product.stock)
-                Product.objects.filter(id=i.product.id).update(stock=0)
-                OutdemandDetail.objects.create(outDemand = outdemand,product = i.product,outNum = (0-res))
+        result = '0'
+        if  Order.objects.get(id = order_id).status == "已审核":
+            Order.objects.filter(id = order_id).update(status="部分发货")
+            deliver = Deliver.objects.create(order=order, user=user, addTime=timezone.now(), status="已发货")
+            outdemand = OutDemand.objects.create(order = order,user = user,addTime = timezone.now(),status ="缺货")
+            orderdetail = order.order_detail_set.all()
+            for i in orderdetail:
+                stock = i.product.stock
+                res = i.product.stock - i.orderNum
+                if stock == 0:
+                    OutdemandDetail.objects.create(outDemand = outdemand,product = i.product,outNum = (0-res))
+                elif res >= 0:
+                    Product.objects.filter(id=i.product.id).update(stock=res)
+                    DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.orderNum)
+                else:
+                    DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.product.stock)
+                    Product.objects.filter(id=i.product.id).update(stock=0)
+                    OutdemandDetail.objects.create(outDemand = outdemand,product = i.product,outNum = (0-res))
+            result = 'post_success'
         data = {}
-        data['result'] = 'post_success'
+        data['result'] = result
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 # 销售管理-完全缺货开缺货单
@@ -394,13 +407,16 @@ def sales_wqquehuo(req):
         userid = req.session['user_id']
         order = Order.objects.get(id=order_id)
         user = User.objects.get(id=userid)
-        Order.objects.filter(id=order_id).update(status="缺货")
-        outdemand = OutDemand.objects.create(order=order, user=user, addTime=timezone.now(), status="缺货")
-        orderdetail = order.order_detail_set.all()
-        for i in orderdetail:
-            OutdemandDetail.objects.create(outDemand=outdemand, product=i.product, outNum=i.orderNum)
+        result = '0'
+        if Order.objects.get(id=order_id).status == "已审核":
+            Order.objects.filter(id=order_id).update(status="缺货")
+            outdemand = OutDemand.objects.create(order=order, user=user, addTime=timezone.now(), status="缺货")
+            orderdetail = order.order_detail_set.all()
+            for i in orderdetail:
+                OutdemandDetail.objects.create(outDemand=outdemand, product=i.product, outNum=i.orderNum)
+            result =  'post_success'
         data = {}
-        data['result'] = 'post_success'
+        data['result'] = result
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -437,12 +453,15 @@ def sales_delorder(req):
     if req.method == "POST":
         id = req.POST.get('id')
         order = Order.objects.get(id = id)
-        orderdetail = order.order_detail_set.all()
-        for i in orderdetail:
-            i.delete()
-        order.delete()
+        result = '0'
         data = {}
-        data['result'] = 'post_success'
+        if order.status == '待审核':
+            orderdetail = order.order_detail_set.all()
+            for i in orderdetail:
+                i.delete()
+            order.delete()
+            result = 'post_success'
+        data['result'] = result
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -641,13 +660,31 @@ def kucun_againpurchasenotice(req):
         result = 'post_success'
         return HttpResponse(json.dumps(result), content_type='application/json')
 
+# 采购管理-再订货单删除
+@csrf_exempt
+def caigou_zaidinghuodandel(req):
+    if req.method == 'POST':
+        id = req.POST.get('id')
+        result = '0'
+        if Againpurchase.objects.get(id=id).status == "待发货":
+            againpurchasenoticeID = Againpurchase.againpurchasenotice.id
+            Againpurchasenotice.objects.filter(id = againpurchasenoticeID).update(status = '未处理')
+            Againpurchase.objects.filter(id=id).delete()
+            result = 'post_success'
+        data = {}
+        data['result'] = result
+        data['id'] = id
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
 # 库存管理-再订货通知单删除
 @csrf_exempt
 def kucun_againnoticedel(req):
     if req.method == 'POST':
         id = req.POST.get('id')
-        Againpurchasenotice.objects.filter(id = id).delete()
-        result = 'post_success'
+        result = "0"
+        if Againpurchasenotice.objects.get(id = id).status == "未处理":
+            Againpurchasenotice.objects.filter(id = id).delete()
+            result = 'post_success'
         data = {}
         data['result']=result
         data['id']=id
@@ -730,16 +767,18 @@ def kucun_zaidinghuodanguanli(req):
         status = req.POST.get('status')
         if status == "已收货":
             againpurchase  = Againpurchase.objects.get(id=id)
-            payable = Payable.objects.create(againpurchase = againpurchase, totalAccount = 0,invoiceStatus='未开', addTime =timezone.now(),status = '待付款')
-            product = againpurchase.againpurchasenotice.product
-            num =againpurchase.againpurchasenotice.num
-            supplier = againpurchase.supplier
-            unitprice = ProducttoSupplier.objects.filter(product=product,supplier = supplier)[0].price
-            total = num*unitprice
-            PayableDetail.objects.create(payable = payable, product = product,productName="11",unitPrice = unitprice, salsAmount = num,totalsales = total)
-            Againpurchase.objects.filter(id=id).update(status=status)
-            Payable.objects.filter(id = payable.id).update(totalAccount = total)
-            result = "post_success"
+            result = '0'
+            if againpurchase.status == "已发货":
+                payable = Payable.objects.create(againpurchase = againpurchase, totalAccount = 0,invoiceStatus='未开', addTime =timezone.now(),status = '待付款')
+                product = againpurchase.againpurchasenotice.product
+                num =againpurchase.againpurchasenotice.num
+                supplier = againpurchase.supplier
+                unitprice = ProducttoSupplier.objects.filter(product=product,supplier = supplier)[0].price
+                total = num*unitprice
+                PayableDetail.objects.create(payable = payable, product = product,unitPrice = unitprice, salsAmount = num,totalsales = total)
+                Againpurchase.objects.filter(id=id).update(status=status)
+                Payable.objects.filter(id = payable.id).update(totalAccount = total)
+                result = "post_success"
             return HttpResponse(json.dumps(result), content_type='application/json')
 
 #采购管理-再订货通知单管理
@@ -822,9 +861,13 @@ def caigou_againpurchase(req):
         againnoticeid = req.POST.get('againnoticeid')
         supplier = Supplier.objects.get(id = supplierid)
         againnotice = Againpurchasenotice.objects.get(id = againnoticeid)
-        Againpurchase.objects.create(user = user, supplier = supplier, againpurchasenotice = againnotice, addTime = timezone.now(),status = "待发货")
+        result = '0'
+        if againnotice.status == "未处理":
+            Againpurchase.objects.create(user = user, supplier = supplier, againpurchasenotice = againnotice, addTime = timezone.now(),status = "待发货")
+            result = 'post_success'
+            Againpurchasenotice.objects.filter(id=againnoticeid).update(status = "已处理")
         data = {}
-        data['result'] = 'post_success'
+        data['result'] = result
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -896,18 +939,19 @@ def kucun_quehuodanfahuo(req):
         outDemand = OutDemand.objects.get(id=id)
         userid = req.session['user_id']
         order = outDemand.order
-        user = User.objects.get(id=userid)
-        Order.objects.filter(id=order.id).update(status="已发货")
-        deliver = Deliver.objects.create(order=order, user=user, addTime=timezone.now(), status="已发货")
-        outdemandDetail = OutdemandDetail.objects.filter(outDemand=outDemand).all()
-        for i in outdemandDetail:
-            stock = i.product.stock - i.outNum
-            Product.objects.filter(id=i.product.id).update(stock=stock)
-            DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.outNum)
-        OutDemand.objects.filter(id=outDemand.id).update(status = "已处理")
-
+        result = '0'
+        if outDemand.status == "缺货":
+            Order.objects.filter(id=order.id).update(status="已发货")
+            deliver = Deliver.objects.create(order=order, user=user, addTime=timezone.now(), status="已发货")
+            outdemandDetail = OutdemandDetail.objects.filter(outDemand=outDemand).all()
+            for i in outdemandDetail:
+                stock = i.product.stock - i.outNum
+                Product.objects.filter(id=i.product.id).update(stock=stock)
+                DeliverDatail.objects.create(deliver=deliver, product=i.product, deliverNum=i.outNum)
+            OutDemand.objects.filter(id=outDemand.id).update(status = "已处理")
+            result = 'post_success'
         data = {}
-        data['result'] = 'post_success'
+        data['result'] = result
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 #mkx-再订货单
@@ -1052,8 +1096,11 @@ def supplier_zaidinghuo(req):
         return  render(req, 'supplier_zaidinghuodanguanli.html', data)
     else:
         id = req.POST.get('id')
-        Againpurchase.objects.filter(id = id).update(status = "已发货")
-        result = "post_success"
+        result = '1'
+        print 111
+        if Againpurchase.objects.get(id = id).status =="待发货":
+            Againpurchase.objects.filter(id = id).update(status = "已发货")
+            result = "post_success"
         return HttpResponse(json.dumps(result), content_type='application/json')
 
 # 供应商报价 详情
@@ -1192,9 +1239,12 @@ def caiwu_zhifu(req):
         data = {}
         paylist = []
         pay = Payable.objects.get(id=id)
-        Payable.objects.filter(id = id).update(status = '已支付')
-        Purchase_account.objects.create(payable = pay,addTime = timezone.now(), totalAccount = pay.totalAccount)
-        data['result'] = 'post_success'
+        result = '0'
+        if pay.status== "待付款":
+            Payable.objects.filter(id = id).update(status = '已支付')
+            Purchase_account.objects.create(payable = pay,addTime = timezone.now(), totalAccount = pay.totalAccount)
+            result = 'post_success'
+        data['result'] = result
         data['id'] = id
         return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -1365,3 +1415,47 @@ def zhuye(req):
 def signup(req):
     if req.method == 'GET':
         return  render(req,'signup.html',{})
+
+#eoq
+@csrf_exempt
+def eoq(req):
+    if req.method == 'GET':
+        data = {}
+        username = req.session['username']
+        product = Product.objects.all()
+        productlist = []
+        for k in product:
+            productlist.append(k.productName)
+        data['productlist'] = productlist
+        data['username'] = username
+        user = User.objects.get(userName=username)
+        if user.userRole_id == 1:
+            base_template = 'admin_base.html'
+        else:
+            base_template = 'kucun_base.html'
+        data['base_template'] = base_template
+        return  render(req,'kucun_eoq.html',data)
+    else:
+        data ={}
+        productname = req.POST.get('product')
+        product = Product.objects.filter(productName = productname)[0]
+        cost = float(req.POST.get('cost'))
+        yearprice = float(req.POST.get('yearprice'))
+        today = datetime.datetime.now()
+        oneday = datetime.timedelta(days=30)
+        yesterday = today - oneday
+        print yesterday
+        order_detail = Order_detail.objects.filter(product = product)
+        asum = 0
+        for i in order_detail:
+            if i.order.orderTime >yesterday:
+                asum += i.orderNum
+        sum = int((asum/30)*365)
+        aeoq = math.sqrt(2*sum*cost/yearprice)
+        eoq = int(aeoq)
+        data['eoq'] = eoq
+        data['result'] = 'post_success'
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+

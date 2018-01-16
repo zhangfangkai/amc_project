@@ -39,10 +39,13 @@ urlpatterns = [
     #采购管理
     url(r'^caigou_gongyingshangguanli', caigou_gongyingshangguanli),
     url(r'^caigou_zaidinghuodanguanli', caigou_zaidinghuodanguanli),
+    url(r'^caigou_zaidinghuodandel', caigou_zaidinghuodandel),
+
     url(r'^caigou_suppliermodify', caigou_suppliermodify),
     url(r'^caigou_supplierdel', caigou_supplierdel),
     url(r'^caigou_supplierdetail', caigou_supplierdetail),
     url(r'^caigou_againpurchasenotice', caigou_againpurchasenotice),
+    url(r'^caigou_againpurchase', caigou_againpurchase),
 
 
     #供应商
@@ -66,5 +69,6 @@ urlpatterns = [
     url(r'^lockscreen', lockscreen),
     url(r'^zhuye', zhuye),
     url(r'^signup', signup),
+    url(r'^eoq', eoq),
 
 ]

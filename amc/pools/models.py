@@ -53,7 +53,6 @@ class Product(models.Model):
     productName = models.CharField(max_length=50)
     productSize = models.CharField(max_length=20)
     stock = models.IntegerField()
-    # stocking = models.IntegerField()
     safastock = models.IntegerField()
     saleprice = models.FloatField()
 #订单明细表

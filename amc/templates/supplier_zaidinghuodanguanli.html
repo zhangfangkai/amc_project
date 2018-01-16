@@ -61,7 +61,7 @@
                             <td>{{ i.time|date:"Y-m-d" }}</td>
                             <td>{{ i.status }}</td>
                             <td>
-                                <button class="btn btn-info btn-xs fahuo">发货</button>
+                                <button class="btn btn-info btn-xs deliver">发货</button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -71,42 +71,33 @@
             </div>
         </div><!-- ./smart-widget-inner -->
     </div><!-- ./smart-widget -->
-    </div><!-- ./padding-md -->
-    </div><!-- /main-container -->
-    <footer class="footer">
-        <span class="footer-brand">
-            <strong class="text-danger">Simplify</strong> Admin
-        </span>
-        <p class="no-margin">
-            &copy; 2014 <strong>Simplify Admin</strong>. ALL Rights Reserved.
-        </p>
-    </footer>
-    </div><!-- /wrapper -->
 
     <a href="#" class="scroll-to-top hidden-print"><i class="fa fa-chevron-up fa-lg"></i></a>
     <script type="text/javascript">
-            $(".modal").draggable();
 
-    $('.fahuo').on('click',function () {
-        var sta = $(this).parent().prev().get(0);
-        var tr = $(this).parents("tr");
-        var id = tr.attr("id");
-        $.ajax({
-            url: '/pools/supplier_zaidinghuo',
-            type: 'POST',
-            data: {id: id},
-            dataType: 'json',
-            timeout: 10000,
-            success: function (result) {
-                if (result == "post_success") {
-                    sta.innerHTML = "已发货";
-                } else {
-                    alert('删除未成功');
+        $(".modal").draggable();
+
+        $('.deliver').on('click',function () {
+            var sta = $(this).parent().prev().get(0);
+            var tr = $(this).parents("tr");
+            var id = tr.attr("id");
+            console.log('111111');
+            $.ajax({
+                url: '/pools/supplier_zaidinghuo',
+                type: 'POST',
+                data: {id: id},
+                dataType: 'json',
+                timeout: 10000,
+                success: function (result) {
+                    if (result == "post_success") {
+                        sta.innerHTML = "已发货";
+                    } else {
+                        alert('操作未成功');
+                    }
                 }
-            }
-        });
+            });
 
-    })
+        })
     </script>
 
 {% endblock %}
