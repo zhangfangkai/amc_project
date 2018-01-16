@@ -73,6 +73,10 @@ def login(req):
                 purchasepricelist.append(temp)
                 paylist.append(temp2)
                 daylist.append(ayesterday)
+            daylist.reverse()
+            conutlist.reverse()
+            paylist.reverse()
+            purchasepricelist.reverse()
             data['daylist'] = daylist
             data['countlist'] = conutlist
             data['paylist'] = paylist
@@ -696,7 +700,7 @@ def kucun_fahuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        fahuodan = Deliver.objects.all()
+        fahuodan = Deliver.objects.all().order_by('-addTime')
         fahuodanlist = []
 
         for i in fahuodan:
@@ -739,7 +743,7 @@ def kucun_zaidinghuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data = {}
-        zaidinghuodan = Againpurchase.objects.all()
+        zaidinghuodan = Againpurchase.objects.all().order_by('-addTime')
         zaidinghuodanlist = []
         for i in zaidinghuodan:
             product = i.againpurchasenotice.product
@@ -878,7 +882,7 @@ def kucun_quehuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        quehuodan = OutDemand.objects.all()
+        quehuodan = OutDemand.objects.all().order_by('-addTime')
         quehuodanlist = []
         for i in quehuodan:
             quehuodandetail={}
@@ -960,7 +964,7 @@ def caigou_zaidinghuodanguanli(req):
     if req.method == 'GET':
         username = req.session['username']
         data={}
-        zaidinghuodan = Againpurchase.objects.all()
+        zaidinghuodan = Againpurchase.objects.all().order_by('-addTime')
         zaidinghuodanlist = []
         for i in zaidinghuodan:
             product = i.againpurchasenotice.product
@@ -1075,7 +1079,7 @@ def supplier_zaidinghuo(req):
         user = User.objects.get(id = user_id)
         supplier = Supplier.objects.filter(user = user)[0]
         data = {}
-        againpurchase = Againpurchase.objects.filter(supplier = supplier).all()
+        againpurchase = Againpurchase.objects.filter(supplier = supplier).all().order_by('-addTime')
         againlist = []
         for i in againpurchase:
             detail ={}
@@ -1097,7 +1101,6 @@ def supplier_zaidinghuo(req):
     else:
         id = req.POST.get('id')
         result = '1'
-        print 111
         if Againpurchase.objects.get(id = id).status =="待发货":
             Againpurchase.objects.filter(id = id).update(status = "已发货")
             result = "post_success"
@@ -1389,6 +1392,10 @@ def zhuye(req):
         purchasepricelist.append(temp)
         paylist.append(temp2)
         daylist.append(ayesterday)
+    daylist.reverse()
+    conutlist.reverse()
+    paylist.reverse()
+    purchasepricelist.reverse()
     data['daylist'] = daylist
     data['countlist'] = conutlist
     data['paylist'] = paylist
@@ -1444,7 +1451,6 @@ def eoq(req):
         today = datetime.datetime.now()
         oneday = datetime.timedelta(days=30)
         yesterday = today - oneday
-        print yesterday
         order_detail = Order_detail.objects.filter(product = product)
         asum = 0
         for i in order_detail:
